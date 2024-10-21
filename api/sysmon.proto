@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package monitor;
+
+option go_package="github.com/sitnikovik/sysmon/pkg/v1;sysmon_v1";
+
+service SystemStats {
+    rpc GetStats (StatsRequest) returns (StatsResponse) {}
+}
+
+message StatsRequest {
+    int32 N = 1; // Период обновления статистики (в секундах)
+    int32 M = 2; // Усредненный интервал (в секундах)
+}
+
+message StatsResponse {
+    double load_average = 1;
+    double cpu_user_mode = 2;
+    double cpu_system_mode = 3;
+    double cpu_idle = 4;
+    DiskStats disk_stats = 5;
+    repeated NetworkStats network_stats = 6;
+}
+
+message DiskStats {
+    double tps = 1;
+    double kb_per_sec = 2;
+}
+
+message NetworkStats {
+    string protocol = 1;
+    string source = 2;
+    string destination = 3;
+    int64 bytes_per_sec = 4;
+}

@@ -1,0 +1,130 @@
+package cpu
+
+import (
+	"fmt"
+	"os/exec"
+	"runtime"
+	"strconv"
+	"strings"
+)
+
+// Stats содержит статистику о CPU
+type Stats struct {
+	LoadAverage   float64
+	CpuUserMode   float64 // %user_mode
+	CpuSystemMode float64 // %system_mode
+	CpuIdle       float64 // %idle
+}
+
+// Collect собирает статистику CPU для разных операционных систем
+func Collect() (*Stats, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return collectStatsLinux()
+	case "darwin": // macOS
+		return collectStatsMac()
+	case "windows":
+		return collectStatsWindows()
+	default:
+		return nil, fmt.Errorf("unsupported operating system: %s", runtime.GOOS)
+	}
+}
+
+// collectStatsLinux собирает статистику для Linux
+func collectStatsLinux() (*Stats, error) {
+	// Получаем среднюю загрузку
+	loadAvgOutput, err := exec.Command("cat", "/proc/loadavg").Output()
+	if err != nil {
+		return nil, err
+	}
+	loadAvgParts := strings.Fields(string(loadAvgOutput))
+	loadAvgValue, _ := strconv.ParseFloat(loadAvgParts[0], 64)
+
+	// Получаем загрузку CPU
+	cpuUsageOutput, err := exec.Command("mpstat", "1", "1").Output()
+	if err != nil {
+		return nil, err
+	}
+	cpuLines := strings.Split(string(cpuUsageOutput), "\n")
+	var user, system, idle float64
+
+	for _, line := range cpuLines {
+		if strings.Contains(line, "all") {
+			parts := strings.Fields(line)
+			user, _ = strconv.ParseFloat(parts[2], 64)    // %user_mode
+			system, _ = strconv.ParseFloat(parts[12], 64) // %system_mode
+			idle, _ = strconv.ParseFloat(parts[11], 64)   // %idle
+			break
+		}
+	}
+
+	return &Stats{
+		LoadAverage:   loadAvgValue,
+		CpuUserMode:   user,
+		CpuSystemMode: system,
+		CpuIdle:       idle,
+	}, nil
+}
+
+// Функция для сбора статистики
+func collectStatsMac() (*Stats, error) {
+	// Получаем среднюю загрузку
+	loadAvgOutput, err := exec.Command("sysctl", "-n", "vm.loadavg").Output()
+	if err != nil {
+		return nil, err
+	}
+	loadAvgParts := strings.Fields(string(loadAvgOutput))
+	loadAvgValue, _ := strconv.ParseFloat(loadAvgParts[0], 64)
+
+	// Получаем загрузку CPU
+	cpuUsageOutput, err := exec.Command("ps", "-A", "-o", "%cpu").Output()
+	if err != nil {
+		return nil, err
+	}
+	cpuLines := strings.Split(string(cpuUsageOutput), "\n")
+	var cpuUserMode, totalProcesses float64
+	for _, line := range cpuLines[1:] { // пропускаем заголовок
+		if line != "" {
+			usage, _ := strconv.ParseFloat(strings.TrimSpace(line), 64)
+			cpuUserMode += usage
+			totalProcesses++
+		}
+	}
+
+	cpuUserMode /= totalProcesses
+	cpuSystemMode := 0.0         // macOS не предоставляет %system_mode
+	cpuIdle := 100 - cpuUserMode // %idle
+
+	return &Stats{
+		LoadAverage:   loadAvgValue,
+		CpuUserMode:   cpuUserMode,
+		CpuSystemMode: cpuSystemMode,
+		CpuIdle:       cpuIdle,
+	}, nil
+}
+
+// collectStatsWindows собирает статистику для Windows
+func collectStatsWindows() (*Stats, error) {
+	// Получаем загрузку CPU с помощью WMIC
+	cpuUsageOutput, err := exec.Command("wmic", "cpu", "get", "loadpercentage").Output()
+	if err != nil {
+		return nil, err
+	}
+	cpuLines := strings.Split(string(cpuUsageOutput), "\n")
+	var cpuUsage float64
+
+	for _, line := range cpuLines {
+		if strings.TrimSpace(line) != "" && line != "LoadPercentage" {
+			cpuUsage, _ = strconv.ParseFloat(strings.TrimSpace(line), 64)
+			break
+		}
+	}
+
+	// Для Windows нет прямого эквивалента для load average, можем установить его в 0
+	return &Stats{
+		LoadAverage:   0,
+		CpuUserMode:   cpuUsage,
+		CpuSystemMode: 0,              // На Windows мы не можем получить это значение напрямую
+		CpuIdle:       100 - cpuUsage, // %idle
+	}, nil
+}

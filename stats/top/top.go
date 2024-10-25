@@ -14,7 +14,7 @@ type CpuStats struct {
 
 // Parse парсит результат выполнения команды `top -b -n1`
 func Parse() (*CpuStats, error) {
-	out, err := exec.Command("top", "-b", "-n1").Output()
+	out, err := exec.Command("top", "-n1").Output()
 	if err != nil {
 		return nil, err
 	}

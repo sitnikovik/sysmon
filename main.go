@@ -5,10 +5,18 @@ import (
 	"flag"
 	"log"
 	"net"
+	"time"
 
 	"google.golang.org/grpc"
 
 	pb "github.com/sitnikovik/sysmon/pkg/v1/api"
+	"github.com/sitnikovik/sysmon/stats/df"
+	"github.com/sitnikovik/sysmon/stats/iostats"
+	"github.com/sitnikovik/sysmon/stats/netstat"
+	netdev "github.com/sitnikovik/sysmon/stats/proc/net-dev"
+	stats "github.com/sitnikovik/sysmon/stats/proc/stat"
+	"github.com/sitnikovik/sysmon/stats/tcpdump"
+	"github.com/sitnikovik/sysmon/stats/top"
 )
 
 type server struct {
@@ -41,5 +49,25 @@ func main() {
 	log.Println("gRPC server listening on port " + grpcPort)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
+	}
+
+	// Запуск сбора статистики
+	run()
+}
+
+// run запускает сбор статистики в режиме реального времени
+func run() {
+	for {
+		// Сбор статистики
+		top.Parse()
+		df.Parse()
+		iostats.Parse()
+		netstat.Parse()
+		netdev.Parse()
+		stats.Parse()
+		tcpdump.Parse()
+
+		// Интервал сбора данных (например, каждые 30 секунд)
+		time.Sleep(30 * time.Second)
 	}
 }

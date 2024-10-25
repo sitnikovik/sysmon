@@ -1,6 +1,8 @@
 package tcpdump
 
 import (
+	"fmt"
+	"os/exec"
 	"regexp"
 	"strconv"
 )
@@ -17,8 +19,25 @@ type PacketData struct {
 	Length  int
 }
 
+// Parse Парсинг вывода команды tcpdump
+func Parse() (*PacketData, error) {
+	cmd := exec.Command("tcpdump", "-ntq", "-i", "any", "-P", "inout", "-c", "10")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("\nTCPDump Output:")
+	packet, err := parseString(string(output))
+	if err != nil {
+		return nil, err
+	}
+
+	return packet, nil
+}
+
 // ParseString парсит строку tcpdump и возвращает PacketData
-func ParseString(line string) (*PacketData, error) {
+func parseString(line string) (*PacketData, error) {
 	// Регулярное выражение для парсинга строки tcpdump
 	// Пример строки: IP 192.168.1.1.45678 > 192.168.1.2.80: Flags [S], seq 12345, win 14600, length 0
 	regstr := `IP\s+([0-9.]+)\.(\d+)\s+>\s+([0-9.]+)\.(\d+):\s+Flags\s+\[(\w+)\],\s+seq\s+(\d+),\s+win\s+(\d+),\s+length\s+(\d+)`

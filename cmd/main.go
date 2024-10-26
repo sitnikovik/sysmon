@@ -30,5 +30,5 @@ func main() {
 	// Запуск сбора статистикиn
 	n := time.Duration(flags.N) * time.Second
 	m := time.Duration(flags.M) * time.Second
-	collectMetrics(n, m)
+	run(n, m)
 }

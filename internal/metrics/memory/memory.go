@@ -35,8 +35,11 @@ func (m MemoryStats) String() string {
 	// TODO: Подумать, может принтить только ненулевые значения
 	// Может быть актуально когда заведем на других ОС
 	return fmt.Sprintf(
-		"Free: %d MB, Used: %d MB, Available: %d MB, Total: %d MB",
-		m.Free, m.Active, m.Available, m.Total,
+		"Free: %s MB, Used: %s MB, Available: %s MB, Total: %s MB",
+		utils.BeatifyNumber(m.Free),
+		utils.BeatifyNumber(m.Active),
+		utils.BeatifyNumber(m.Available),
+		utils.BeatifyNumber(m.Total),
 	)
 }
 

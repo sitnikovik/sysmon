@@ -16,7 +16,7 @@ type MemoryStats struct {
 
 // String returns a string representation of the MemoryStats
 func (m MemoryStats) String() string {
-	return fmt.Sprintf("Memory: Free: %d MB, Used: %d MB", m.Free, m.Used)
+	return fmt.Sprintf("Free: %d MB, Used: %d MB", m.Free, m.Used)
 }
 
 // Parse parses the memory statistics of the system

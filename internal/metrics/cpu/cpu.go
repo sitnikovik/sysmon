@@ -18,7 +18,7 @@ type CpuStats struct {
 
 // String returns a string representation of the CpuStats
 func (c CpuStats) String() string {
-	return fmt.Sprintf("CPU Usage: User: %.2f%%, System: %.2f%%, Idle: %.2f%%", c.User, c.System, c.Idle)
+	return fmt.Sprintf("User: %.2f%%, System: %.2f%%, Idle: %.2f%%", c.User, c.System, c.Idle)
 }
 
 // Parse parses the CPU statistics of the system

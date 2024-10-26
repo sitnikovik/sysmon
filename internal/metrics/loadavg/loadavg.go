@@ -1,9 +1,11 @@
 package loadavg
 
 import (
-	"bytes"
+	"errors"
 	"fmt"
-	"os/exec"
+	"strings"
+
+	"github.com/sitnikovik/sysmon/internal/metrics/utils"
 )
 
 // LoadAverageStats represents the system load average
@@ -15,25 +17,28 @@ type LoadAverageStats struct {
 
 // String returns a string representation of the LoadAverage
 func (l LoadAverageStats) String() string {
-	return fmt.Sprintf("Load Average: 1m: %.2f, 5m: %.2f, 15m: %.2f", l.OneMinute, l.FiveMinute, l.FifteenMinute)
+	return fmt.Sprintf("1m: %.2f, 5m: %.2f, 15m: %.2f", l.OneMinute, l.FiveMinute, l.FifteenMinute)
 }
 
 // Parse parses the load average of the system
 func Parse() (LoadAverageStats, error) {
+	lines, err := utils.RunCmdToStrings("uptime")
+	if err != nil {
+		return LoadAverageStats{}, err
+	}
+	if len(lines) != 2 {
+		return LoadAverageStats{}, errors.New("invalid output")
+	}
+
 	res := LoadAverageStats{}
-	cmd := exec.Command("uptime")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-
-	err := cmd.Run()
+	parts := strings.Split(lines[0], "load averages:")
+	if len(parts) < 2 {
+		return LoadAverageStats{}, errors.New("failed to find load averages in output")
+	}
+	_, err = fmt.Sscanf(parts[1], "%f %f %f", &res.OneMinute, &res.FiveMinute, &res.FifteenMinute)
 	if err != nil {
-		return res, err
+		return LoadAverageStats{}, fmt.Errorf("error parsing load averages: %w", err)
 	}
 
-	_, err = fmt.Sscanf(out.String(), "load average: %f, %f, %f", &res.OneMinute, &res.FiveMinute, &res.FifteenMinute)
-	if err != nil {
-		return res, err
-	}
-
-	return res, nil
+	return res, err
 }

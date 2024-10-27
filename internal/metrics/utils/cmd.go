@@ -17,13 +17,17 @@ func RunCmdToStrings(cmd string, args ...string) ([]string, error) {
 }
 
 // BeatifyNumber formats a number by adding underscrore every three digits to bring more readability
-func BeatifyNumber[T int | int64 | float64](num T) string {
+func BeatifyNumber[T int | int64 | uint | uint64 | float64](num T) string {
 	var numStr string
 	switch v := any(num).(type) {
 	case int:
 		numStr = strconv.Itoa(v)
 	case int64:
 		numStr = strconv.FormatInt(v, 10)
+	case uint:
+		numStr = strconv.FormatUint(uint64(v), 10)
+	case uint64:
+		numStr = strconv.FormatUint(v, 10)
 	case float64:
 		numStr = strconv.FormatFloat(v, 'f', -1, 64)
 	}

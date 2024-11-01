@@ -10,6 +10,8 @@ import (
 	"github.com/sitnikovik/sysmon/internal/metrics/disk"
 	loadAvgMetrics "github.com/sitnikovik/sysmon/internal/metrics/loadavg"
 	memoryMetrics "github.com/sitnikovik/sysmon/internal/metrics/memory"
+	"github.com/sitnikovik/sysmon/internal/metrics/network/net"
+	"github.com/sitnikovik/sysmon/internal/metrics/network/traffic"
 )
 
 // metricsStringBuilder is a helper struct for building the metrics output
@@ -70,6 +72,18 @@ func run(interval time.Duration, duration time.Duration) {
 			// Get the disk statistics
 			diskStats, err := disk.Parse()
 			res.append("Disk Usage", diskStats.String(), err)
+
+			// Get the network statistics
+			netStats, err := net.Parse()
+			for _, ns := range netStats {
+				res.append("Network", ns.String(), err)
+			}
+
+			// Get the traffic statistics
+			trafficStats, err := traffic.Parse()
+			for _, ts := range trafficStats {
+				res.append("Traffic", ts.String(), err)
+			}
 
 			// Print the metrics output
 			fmt.Println(res.String())

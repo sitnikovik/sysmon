@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+// RunCmd runs a command and returns its output as a byte slice
+func RunCmd(cmd string, args ...string) ([]byte, error) {
+	return exec.Command(cmd, args...).Output()
+}
+
 // RunCmdToStrings runs a command and returns its output as a slice of strings
 func RunCmdToStrings(cmd string, args ...string) ([]string, error) {
 	output, err := exec.Command(cmd, args...).Output()

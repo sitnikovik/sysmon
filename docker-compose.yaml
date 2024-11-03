@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  ubuntu2204:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ubuntu2204
+    container_name: ubuntu2204
+    networks:
+      - sysmon_network
+
+networks:
+  sysmon_network:
+    driver: bridge

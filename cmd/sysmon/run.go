@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -39,15 +40,19 @@ func (m *metricsStringBuilder) String() string {
 
 // run parses the metrics collection in real-time mode
 func run(interval time.Duration, duration time.Duration) {
-	var wg sync.WaitGroup
-	ticker := time.NewTicker(interval)
+	// Print the system information
+	printSystemInfo()
 
-	// Wait for the duration
+	// Start the spinner and wait for the duration
+	spinnerCh := make(chan bool)
 	if duration > 3*time.Second {
-		fmt.Printf("Waiting for %s to snapshot the system...\n", duration)
+		go spinner(duration, spinnerCh)
 	}
 	time.Sleep(duration)
+	spinnerCh <- true // Stop the spinner
 
+	var wg sync.WaitGroup
+	ticker := time.NewTicker(interval)
 	for range ticker.C {
 		wg.Add(1)
 		go func() {
@@ -93,5 +98,31 @@ func run(interval time.Duration, duration time.Duration) {
 			// Print the metrics output
 			fmt.Println(res.String())
 		}()
+	}
+}
+
+func printSystemInfo() {
+	fmt.Println("System Information")
+	fmt.Println("OS: ", runtime.GOOS)
+	fmt.Println("Architecture: ", runtime.GOARCH)
+	fmt.Println("CPUs: ", runtime.NumCPU())
+	fmt.Println("Go Version: ", runtime.Version())
+	fmt.Println("--------------------")
+}
+
+// spinner shows a spinner while waiting for the duration
+func spinner(duration time.Duration, done chan bool) {
+	spinnerDelay := 100 * time.Millisecond
+	for {
+		select {
+		case <-done:
+			return
+		default:
+			for _, r := range `-\|/` {
+				// Используем \r для возврата курсора в начало строки, чтобы перезаписать
+				fmt.Printf("\rWaiting for %s to snapshot the system %c", duration, r)
+				time.Sleep(spinnerDelay)
+			}
+		}
 	}
 }

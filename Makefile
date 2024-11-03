@@ -13,3 +13,8 @@ protos:
 	--go-grpc_out=pkg/v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	api/sysmon.proto
+
+run-ubuntu:
+	docker-compose up --build ubuntu
+build:
+	go build -o bin/sysmon cmd/sysmon/main.go

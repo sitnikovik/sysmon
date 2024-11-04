@@ -17,7 +17,10 @@ type LoadAverageStats struct {
 
 // String returns a string representation of the LoadAverage
 func (l LoadAverageStats) String() string {
-	return fmt.Sprintf("1m: %.2f, 5m: %.2f, 15m: %.2f", l.OneMinute, l.FiveMinute, l.FifteenMinute)
+	headers := fmt.Sprintf("%-20s %-20s %-20s\n", "1 Min", "5 Min", "15 Min")
+	values := fmt.Sprintf("%-20.2f %-20.2f %-20.2f", l.OneMinute, l.FiveMinute, l.FifteenMinute)
+
+	return utils.BoldText(headers) + utils.GrayText(values)
 }
 
 // Parse parses the load average of the system

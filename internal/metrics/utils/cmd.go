@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -59,4 +60,19 @@ func BeatifyNumber[T int | int64 | uint | uint64 | float64](num T) string {
 	}
 
 	return builder.String()
+}
+
+// BoldText returns a bolded text
+func BoldText(text string) string {
+	return fmt.Sprintf("\033[1m%s\033[0m", text)
+}
+
+// BgGreenText returns a text with green background
+func BgGreenText(text string) string {
+	return fmt.Sprintf("\033[42m%s\033[0m", text)
+}
+
+// GrayText returns a gray text
+func GrayText(text string) string {
+	return fmt.Sprintf("\033[90m%s\033[0m", text)
 }

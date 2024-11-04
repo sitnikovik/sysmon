@@ -21,7 +21,7 @@ func (c CpuStats) String() string {
 	header := fmt.Sprintf("%-10s %-10s %-10s\n", "User", "System", "Idle")
 	values := fmt.Sprintf("%-10.2f %-10.2f %-10.2f", c.User, c.System, c.Idle)
 
-	return header + values
+	return utils.BoldText(header) + utils.GrayText(values)
 	// return fmt.Sprintf("User: %.2f%%, System: %.2f%%, Idle: %.2f%%", c.User, c.System, c.Idle)
 }
 

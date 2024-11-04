@@ -7,7 +7,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sitnikovik/sysmon/internal/metrics/network/traffic"
+	"github.com/sitnikovik/sysmon/internal/metrics/cpu"
+	"github.com/sitnikovik/sysmon/internal/metrics/disk"
+	"github.com/sitnikovik/sysmon/internal/metrics/loadavg"
+	"github.com/sitnikovik/sysmon/internal/metrics/memory"
+	"github.com/sitnikovik/sysmon/internal/metrics/utils"
 )
 
 // metricsStringBuilder is a helper struct for building the metrics output
@@ -35,9 +39,9 @@ func (m *metricsStringBuilder) append(metricName, s string, err error) {
 		return
 	}
 
-	m.sb.WriteString(fmt.Sprintf("\033[1m\033[42m%s\033[0m\n", metricName))
+	m.sb.WriteString(utils.BgGreenText(utils.BoldText(metricName + "\n")))
 
-	m.sb.WriteString(fmt.Sprintf("%s\n", s))
+	m.sb.WriteString(fmt.Sprintf("%s\n\n", s))
 }
 
 // String returns the string representation of the metrics
@@ -47,25 +51,24 @@ func (m *metricsStringBuilder) String() string {
 
 // Print prints the metrics output
 func (m *metricsStringBuilder) Print() {
-	// Calculate the number of lines to clear from the previous output
 	n := strings.Count(m.String(), "\n") + 1
-	for i := 0; i < n; i++ {
-		fmt.Print("\033[A\033[K") // Move cursor up and clear the line
-	}
+	clearLines(n)
 
-	// Print the metrics output
 	fmt.Print("\r" + m.String())
 }
 
 // run parses the metrics collection in real-time mode
 func run(interval time.Duration, duration time.Duration) {
 	// Start the spinner and wait for the duration
-	// spinnerCh := make(chan bool)
-	// go spinner(duration, spinnerCh)
+	spinnerCh := make(chan bool)
+	go spinner(duration, spinnerCh)
 	time.Sleep(duration)
-	// spinnerCh <- true // Stop the spinner
+	spinnerCh <- true // Stop the spinner
 	var wg sync.WaitGroup
 	ticker := time.NewTicker(interval)
+
+	clearScreen()
+
 	for range ticker.C {
 		wg.Add(1)
 		go func() {
@@ -74,20 +77,20 @@ func run(interval time.Duration, duration time.Duration) {
 			res := NewMetricsStringBuilder()
 
 			// // Get the CPU statistics
-			// cpuStats, err := cpuMetrics.Parse()
-			// res.append("CPU Usage", cpuStats.String(), err)
+			cpuStats, err := cpu.Parse()
+			res.append("CPU Usage", cpuStats.String(), err)
 
 			// // // Get the Load Average statistics
-			// loadAvgStats, err := loadAvgMetrics.Parse()
-			// res.append("Load Average", loadAvgStats.String(), err)
+			loadAvgStats, err := loadavg.Parse()
+			res.append("Load Average", loadAvgStats.String(), err)
 
 			// // // Get the Memory statistics
-			// memoryStats, err := memoryMetrics.Parse()
-			// res.append("Memory", memoryStats.String(), err)
+			memoryStats, err := memory.Parse()
+			res.append("Memory", memoryStats.String(), err)
 
 			// // // Get the disk statistics
-			// diskStats, err := disk.Parse()
-			// res.append("Disk Usage", diskStats.String(), err)
+			diskStats, err := disk.Parse()
+			res.append("Disk Usage", diskStats.String(), err)
 
 			// /* Network metrics */
 			// // Get the network statistics
@@ -95,8 +98,6 @@ func run(interval time.Duration, duration time.Duration) {
 			// res.append("Network", netStats.String(), err)
 
 			// Get the traffic statistics
-			trafficStats, err := traffic.Parse()
-			res.append("Traffic", trafficStats.String(), err)
 			/* Network metrics */
 
 			// Get the connections statistics
@@ -123,5 +124,17 @@ func spinner(duration time.Duration, done chan bool) {
 				time.Sleep(spinnerDelay)
 			}
 		}
+	}
+}
+
+// clearScreen clears the screen
+func clearScreen() {
+	fmt.Print("\033[H\033[2J")
+}
+
+// clearLines clears n lines
+func clearLines(n int) {
+	for i := 0; i < n; i++ {
+		fmt.Print("\033[A\033[K")
 	}
 }

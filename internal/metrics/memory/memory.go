@@ -34,13 +34,21 @@ type MemoryStats struct {
 func (m MemoryStats) String() string {
 	// TODO: Подумать, может принтить только ненулевые значения
 	// Может быть актуально когда заведем на других ОС
-	return fmt.Sprintf(
-		"Free: %s MB, Used: %s MB, Available: %s MB, Total: %s MB",
+	headers := fmt.Sprintf(
+		"%-20s %-20s %-20s %-20s %-20s %-20s\n",
+		"Total", "Available", "Free", "Active", "Inactive", "Wired",
+	)
+	values := fmt.Sprintf(
+		"%-20s %-20s %-20s %-20s %-20s %-20s",
+		utils.BeatifyNumber(m.Total),
+		utils.BeatifyNumber(m.Available),
 		utils.BeatifyNumber(m.Free),
 		utils.BeatifyNumber(m.Active),
-		utils.BeatifyNumber(m.Available),
-		utils.BeatifyNumber(m.Total),
+		utils.BeatifyNumber(m.Inactive),
+		utils.BeatifyNumber(m.Wired),
 	)
+
+	return utils.BoldText(headers) + utils.GrayText(values)
 }
 
 // Parse parses the memory statistics of the system

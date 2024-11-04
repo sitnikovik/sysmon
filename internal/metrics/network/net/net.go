@@ -7,9 +7,25 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils"
 )
+
+// NetStats defines the network statistics
+type NetStats struct {
+	nets []NetStat
+}
+
+// String returns a string representation of the NetStats
+func (n NetStats) String() string {
+	sb := strings.Builder{}
+	for _, stat := range n.nets {
+		sb.WriteString(stat.String())
+	}
+
+	return sb.String()
+}
 
 // NetStat describes network statistics for a specific protocol
 type NetStat struct {
@@ -27,13 +43,22 @@ func (n NetStat) String() string {
 }
 
 // Parse parses the network statistics
-func Parse() ([]NetStat, error) {
+func Parse() (NetStats, error) {
+	var nss []NetStat
+	var err error
 	switch runtime.GOOS {
 	case "darwin":
-		return parseForDarwin()
+		nss, err = parseForDarwin()
+		if err != nil {
+			return NetStats{}, err
+		}
+	default:
+		return NetStats{}, fmt.Errorf("unsupported platform %s", runtime.GOOS)
 	}
 
-	return nil, fmt.Errorf("unsupported platform %s", runtime.GOOS)
+	return NetStats{
+		nets: nss,
+	}, nil
 }
 
 // parseForDarwin parses the network statistics on Darwin systems

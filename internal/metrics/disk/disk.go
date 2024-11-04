@@ -31,17 +31,19 @@ type DiskStats struct {
 
 // String returns a string representation of the DiskStats
 func (d DiskStats) String() string {
-	return fmt.Sprintf(
-		"Reads: %s/s, Writes: %s/s, KB Read+Write: %s/s Total: %s MB, Used: %s MB (%.2f%%), Used Inodes: %s (%.2f%%)",
+	header := fmt.Sprintf("%-20s %-20s %-20s %-20s %-20s %-20s\n",
+		"Reads/s", "Writes/s", "KB Read+Write/s", "Total", "Used", "Used Inodes")
+
+	values := fmt.Sprintf("%-20s %-20s %-20s %-20s %-20s %-20s",
 		utils.BeatifyNumber(d.Reads),
 		utils.BeatifyNumber(d.Writes),
-		utils.BeatifyNumber(d.ReadWriteKB),
-		utils.BeatifyNumber(d.TotalMB),
-		utils.BeatifyNumber(d.UsedMB),
-		d.UsedPercent,
-		utils.BeatifyNumber(d.UsedInodes),
-		d.UsedInodesPercent,
+		utils.BeatifyNumber(d.ReadWriteKB)+" KB/s",
+		utils.BeatifyNumber(d.TotalMB)+" MB (100%)",
+		utils.BeatifyNumber(d.UsedMB)+" MB "+fmt.Sprintf("(%.2f%%)", d.UsedPercent),
+		utils.BeatifyNumber(d.UsedInodes)+" "+fmt.Sprintf("(%.2f%%)", d.UsedInodesPercent),
 	)
+
+	return header + values
 }
 
 // Parse parses the disk statistics of the system

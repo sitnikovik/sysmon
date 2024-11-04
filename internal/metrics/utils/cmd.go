@@ -34,7 +34,7 @@ func BeatifyNumber[T int | int64 | uint | uint64 | float64](num T) string {
 	case uint64:
 		numStr = strconv.FormatUint(v, 10)
 	case float64:
-		numStr = strconv.FormatFloat(v, 'f', -1, 64)
+		numStr = strconv.FormatFloat(v, 'f', 2, 64)
 	}
 
 	parts := strings.Split(numStr, ".")

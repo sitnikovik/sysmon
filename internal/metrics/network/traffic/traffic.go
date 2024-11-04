@@ -8,7 +8,27 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 )
+
+// TrafficStats defines the traffic statistics
+type TrafficStats struct {
+	Stats []TrafficStat
+}
+
+// String returns a string representation of the TrafficStats
+func (t TrafficStats) String() string {
+	sb := strings.Builder{}
+	sb.WriteString(fmt.Sprintf(
+		"%-20s %-20s %-20s %-10s %-10s\n",
+		"Protocol", "Source", "Destination", "Bytes", "BPS",
+	))
+	for _, stat := range t.Stats {
+		sb.WriteString(stat.String())
+	}
+
+	return sb.String()
+}
 
 // TrafficStat describes traffic statistics for a specific protocol
 type TrafficStat struct {
@@ -27,19 +47,31 @@ type TrafficStat struct {
 // String returns a string representation of the TrafficStat
 func (t TrafficStat) String() string {
 	return fmt.Sprintf(
-		"Protocol: %s, Source: %s, Destination: %s, Bytes: %d, BPS: %.2f",
-		t.Protocol, t.Source, t.Destination, t.Bytes, t.BPS,
+		"%-20s %-20s %-20s %-10d %-10.2f\n",
+		t.Protocol,
+		t.Source,
+		t.Destination,
+		t.Bytes,
+		t.BPS,
 	)
 }
 
 // Parse parses the traffic statistics
-func Parse() ([]TrafficStat, error) {
+func Parse() (TrafficStats, error) {
+	var stats []TrafficStat
+	var err error
+
 	switch runtime.GOOS {
 	case "darwin":
-		return parseForDarwin()
+		stats, err = parseForDarwin()
+		if err != nil {
+			return TrafficStats{}, err
+		}
 	}
 
-	return nil, fmt.Errorf("unsupported platform %s", runtime.GOOS)
+	return TrafficStats{
+		Stats: stats,
+	}, nil
 }
 
 // parseForDarwin parses the traffic statistics on Darwin systems

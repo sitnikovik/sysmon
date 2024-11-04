@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -21,17 +22,44 @@ type ConnectionStat struct {
 
 // String returns a string representation of the ConnectionStat
 func (n ConnectionStat) String() string {
+	// Sort the sockets by protocol and port before printing
+	n.sortSocketsByProtocolAndPort()
+
+	// Create a string representation of the TCP states
 	tcpsb := strings.Builder{}
 	for state, count := range n.TCPStates {
 		tcpsb.WriteString(fmt.Sprintf("%s: %d, ", state, count))
 	}
+	tcpStates := strings.TrimSuffix(tcpsb.String(), ", ")
 
+	// Print tablle
 	socketsb := strings.Builder{}
+	socketsb.WriteString(fmt.Sprintf(
+		"%-10s %-6s %-10s %-10s\n",
+		"Protocol", "PID", "Port", "Command",
+	))
+	socketsb.WriteString(strings.Repeat("-", 40) + "\n")
 	for _, socket := range n.ListeningSockets {
-		socketsb.WriteString(fmt.Sprintf("- %s\n", socket.String()))
+		socketsb.WriteString(
+			fmt.Sprintf(
+				"%-10s %-6d %-10d %-5s\n",
+				socket.Protocol, socket.PID, socket.Port, socket.Command,
+			),
+		)
 	}
 
-	return fmt.Sprintf("\nTCPStates: %s\nListening sockets:\n%s", tcpsb.String(), socketsb.String())
+	return fmt.Sprintf("TCPStates: %s\nListening Sockets:\n%s", tcpStates, socketsb.String())
+}
+
+// sortSocketsByProtocolAndPort сортирует сокеты по протоколу и порту
+func (n ConnectionStat) sortSocketsByProtocolAndPort() {
+	sort.Slice(n.ListeningSockets, func(i, j int) bool {
+		// Сначала сортируем по протоколу (TCP/UDP), затем по номеру порта
+		if n.ListeningSockets[i].Protocol == n.ListeningSockets[j].Protocol {
+			return n.ListeningSockets[i].Port < n.ListeningSockets[j].Port
+		}
+		return n.ListeningSockets[i].Protocol < n.ListeningSockets[j].Protocol
+	})
 }
 
 // SocketInfo structure for socket information

@@ -7,16 +7,24 @@ import (
 	"sync"
 	"time"
 
-	cpuMetrics "github.com/sitnikovik/sysmon/internal/metrics/cpu"
-	"github.com/sitnikovik/sysmon/internal/metrics/disk"
-	loadAvgMetrics "github.com/sitnikovik/sysmon/internal/metrics/loadavg"
-	memoryMetrics "github.com/sitnikovik/sysmon/internal/metrics/memory"
-	"github.com/sitnikovik/sysmon/internal/metrics/network/connections"
+	"github.com/sitnikovik/sysmon/internal/metrics/network/traffic"
 )
 
 // metricsStringBuilder is a helper struct for building the metrics output
 type metricsStringBuilder struct {
 	sb strings.Builder
+}
+
+func NewMetricsStringBuilder() *metricsStringBuilder {
+	m := &metricsStringBuilder{}
+	m.sb.WriteString("System Information\n")
+	m.sb.WriteString(fmt.Sprintf("OS: %s\n", runtime.GOOS))
+	m.sb.WriteString(fmt.Sprintf("Architecture: %s\n", runtime.GOARCH))
+	m.sb.WriteString(fmt.Sprintf("CPUs: %d\n", runtime.NumCPU()))
+	m.sb.WriteString(fmt.Sprintf("Go Version: %s\n", runtime.Version()))
+	m.sb.WriteString("--------------------\n")
+
+	return m
 }
 
 // append appends the metric name and the string representation of the metric
@@ -27,87 +35,78 @@ func (m *metricsStringBuilder) append(metricName, s string, err error) {
 		return
 	}
 
-	m.sb.WriteString(fmt.Sprintf("%s: %s\n", metricName, s))
+	m.sb.WriteString(fmt.Sprintf("\033[1m\033[42m%s\033[0m\n", metricName))
+
+	m.sb.WriteString(fmt.Sprintf("%s\n", s))
 }
 
 // String returns the string representation of the metrics
 func (m *metricsStringBuilder) String() string {
-	s := time.Now().Format("2006-01-02 15:04:05")
-	s += "\n" + m.sb.String()
+	return m.sb.String()
+}
 
-	return s
+// Print prints the metrics output
+func (m *metricsStringBuilder) Print() {
+	// Calculate the number of lines to clear from the previous output
+	n := strings.Count(m.String(), "\n") + 1
+	for i := 0; i < n; i++ {
+		fmt.Print("\033[A\033[K") // Move cursor up and clear the line
+	}
+
+	// Print the metrics output
+	fmt.Print("\r" + m.String())
 }
 
 // run parses the metrics collection in real-time mode
 func run(interval time.Duration, duration time.Duration) {
-	// Print the system information
-	printSystemInfo()
-
 	// Start the spinner and wait for the duration
-	spinnerCh := make(chan bool)
-	if duration > 3*time.Second {
-		go spinner(duration, spinnerCh)
-	}
+	// spinnerCh := make(chan bool)
+	// go spinner(duration, spinnerCh)
 	time.Sleep(duration)
-	spinnerCh <- true // Stop the spinner
-
+	// spinnerCh <- true // Stop the spinner
 	var wg sync.WaitGroup
 	ticker := time.NewTicker(interval)
 	for range ticker.C {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-
 			// Builder for storing the metrics output to be printed
-			res := &metricsStringBuilder{}
+			res := NewMetricsStringBuilder()
 
-			// Get the CPU statistics
-			cpuStats, err := cpuMetrics.Parse()
-			res.append("CPU Usage", cpuStats.String(), err)
+			// // Get the CPU statistics
+			// cpuStats, err := cpuMetrics.Parse()
+			// res.append("CPU Usage", cpuStats.String(), err)
 
-			// Get the Load Average statistics
-			loadAvgStats, err := loadAvgMetrics.Parse()
-			res.append("Load Average", loadAvgStats.String(), err)
+			// // // Get the Load Average statistics
+			// loadAvgStats, err := loadAvgMetrics.Parse()
+			// res.append("Load Average", loadAvgStats.String(), err)
 
-			// Get the Memory statistics
-			memoryStats, err := memoryMetrics.Parse()
-			res.append("Memory", memoryStats.String(), err)
+			// // // Get the Memory statistics
+			// memoryStats, err := memoryMetrics.Parse()
+			// res.append("Memory", memoryStats.String(), err)
 
-			// Get the disk statistics
-			diskStats, err := disk.Parse()
-			res.append("Disk Usage", diskStats.String(), err)
+			// // // Get the disk statistics
+			// diskStats, err := disk.Parse()
+			// res.append("Disk Usage", diskStats.String(), err)
 
-			/* Network metrics *
-			// Get the network statistics
-			netStats, err := net.Parse()
-			for _, ns := range netStats {
-				res.append("Network", ns.String(), err)
-			}
+			// /* Network metrics */
+			// // Get the network statistics
+			// netStats, err := net.Parse()
+			// res.append("Network", netStats.String(), err)
 
 			// Get the traffic statistics
 			trafficStats, err := traffic.Parse()
-			for _, ts := range trafficStats {
-				res.append("Traffic", ts.String(), err)
-			}
+			res.append("Traffic", trafficStats.String(), err)
 			/* Network metrics */
 
 			// Get the connections statistics
-			connStat, err := connections.Parse()
-			res.append("Connections", connStat.String(), err)
+			// connStat, err := connections.Parse()
+			// res.append("Connections", connStat.String(), err)
 
 			// Print the metrics output
-			fmt.Println(res.String())
+			res.Print()
 		}()
 	}
-}
-
-func printSystemInfo() {
-	fmt.Println("System Information")
-	fmt.Println("OS: ", runtime.GOOS)
-	fmt.Println("Architecture: ", runtime.GOARCH)
-	fmt.Println("CPUs: ", runtime.NumCPU())
-	fmt.Println("Go Version: ", runtime.Version())
-	fmt.Println("--------------------")
 }
 
 // spinner shows a spinner while waiting for the duration

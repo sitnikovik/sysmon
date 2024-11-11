@@ -12,6 +12,7 @@ func RunCmd(cmd string, args ...string) ([]byte, error) {
 	return exec.Command(cmd, args...).Output()
 }
 
+// RunCmd runs a command and returns its output as a byte slice
 // RunCmdToStrings runs a command and returns its output as a slice of strings
 func RunCmdToStrings(cmd string, args ...string) ([]string, error) {
 	output, err := exec.Command(cmd, args...).Output()

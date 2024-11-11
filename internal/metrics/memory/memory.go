@@ -35,11 +35,11 @@ func (m MemoryStats) String() string {
 	// TODO: Подумать, может принтить только ненулевые значения
 	// Может быть актуально когда заведем на других ОС
 	headers := fmt.Sprintf(
-		"%-20s %-20s %-20s %-20s %-20s %-20s\n",
+		"%-10s %-10s %-10s %-10s %-10s %-10s\n",
 		"Total", "Available", "Free", "Active", "Inactive", "Wired",
 	)
 	values := fmt.Sprintf(
-		"%-20s %-20s %-20s %-20s %-20s %-20s",
+		"%-10s %-10s %-10s %-10s %-10s %-10s",
 		utils.BeatifyNumber(m.Total),
 		utils.BeatifyNumber(m.Available),
 		utils.BeatifyNumber(m.Free),

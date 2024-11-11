@@ -12,6 +12,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/metrics/loadavg"
 	"github.com/sitnikovik/sysmon/internal/metrics/memory"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils"
+	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 )
 
 // metricsStringBuilder is a helper struct for building the metrics output
@@ -77,8 +78,8 @@ func run(interval time.Duration, duration time.Duration) {
 			res := NewMetricsStringBuilder()
 
 			// // Get the CPU statistics
-			cpuStats, err := cpu.Parse()
-			res.append("CPU Usage", cpuStats.String(), err)
+			cpuStats, err := cpu.NewParser(cmd.NewExecer()).Parse()
+			res.append("CPU Usage                        ", cpuStats.String(), err)
 
 			// // // Get the Load Average statistics
 			loadAvgStats, err := loadavg.Parse()
@@ -102,7 +103,7 @@ func run(interval time.Duration, duration time.Duration) {
 
 			// Get the connections statistics
 			// connStat, err := connections.Parse()
-			// res.append("Connections", connStat.String(), err)
+			// res.append("Connections                                                        ", connStat.String(), err)
 
 			// Print the metrics output
 			res.Print()

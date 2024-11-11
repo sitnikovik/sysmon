@@ -8,17 +8,18 @@ import (
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
+	"github.com/sitnikovik/sysmon/internal/metrics/utils/strings"
 )
 
-// argsToInterfacesForOS maps command string arguments to interfaces for os
-func argsToInterfacesForOS(os string) []interface{} {
-	res := make([]interface{}, len(argsByOS[os]))
-	for i, arg := range argsByOS[os] {
-		res[i] = interface{}(arg)
-	}
+// // argsToInterfacesForOS maps command string arguments to interfaces for os
+// func argsToInterfacesForOS(os string) []interface{} {
+// 	res := make([]interface{}, len(argsByOS[os]))
+// 	for i, arg := range argsByOS[os] {
+// 		res[i] = interface{}(arg)
+// 	}
 
-	return res
-}
+// 	return res
+// }
 
 func TestNewParser(t *testing.T) {
 	t.Parallel()
@@ -53,7 +54,7 @@ func Test_parser_Parse(t *testing.T) {
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
-						Exec(cmdByOS[os.Darwin], argsToInterfacesForOS(os.Darwin)...).
+						Exec(cmdByOS[os.Darwin], strings.ToInterfaces(argsByOS[os.Darwin])...).
 						Return(&cmd.Result{
 							Bytes: []byte("CPU usage: 10.0% user, 20.0% sys, 70.0% idle"),
 						}, nil)
@@ -78,7 +79,7 @@ func Test_parser_Parse(t *testing.T) {
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
-						Exec(cmdByOS[os.Darwin], argsToInterfacesForOS(os.Darwin)...).
+						Exec(cmdByOS[os.Darwin], strings.ToInterfaces(argsByOS[os.Darwin])...).
 						Return(nil, errors.New("invalid cmd"))
 
 					execer.EXPECT().

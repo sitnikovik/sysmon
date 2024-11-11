@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -10,16 +11,6 @@ import (
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/strings"
 )
-
-// // argsToInterfacesForOS maps command string arguments to interfaces for os
-// func argsToInterfacesForOS(os string) []interface{} {
-// 	res := make([]interface{}, len(argsByOS[os]))
-// 	for i, arg := range argsByOS[os] {
-// 		res[i] = interface{}(arg)
-// 	}
-
-// 	return res
-// }
 
 func TestNewParser(t *testing.T) {
 	t.Parallel()
@@ -41,9 +32,13 @@ func Test_parser_Parse(t *testing.T) {
 	type fields struct {
 		execerMockFunc func(t *testing.T) cmd.Execer
 	}
+	type args struct {
+		ctx context.Context
+	}
 	tests := []struct {
 		name    string
 		fields  fields
+		args    args
 		want    CpuStats
 		wantErr bool
 	}{
@@ -65,6 +60,9 @@ func Test_parser_Parse(t *testing.T) {
 
 					return execer
 				},
+			},
+			args: args{
+				ctx: context.Background(),
 			},
 			want: CpuStats{
 				User:   10.0,
@@ -115,7 +113,7 @@ func Test_parser_Parse(t *testing.T) {
 			p := &parser{
 				execer: tt.fields.execerMockFunc(t),
 			}
-			got, err := p.Parse()
+			got, err := p.Parse(tt.args.ctx)
 
 			assert.Equal(t, tt.want, got)
 			if tt.wantErr {

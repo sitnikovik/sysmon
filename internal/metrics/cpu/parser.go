@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -42,7 +43,7 @@ func (c CpuStats) String() string {
 
 // Parser defines the interface for parsing CPU statistics
 type Parser interface {
-	Parse() (CpuStats, error)
+	Parse(ctx context.Context) (CpuStats, error)
 }
 
 // parser - struct to hold the parser dependencies
@@ -58,21 +59,17 @@ func NewParser(execer cmd.Execer) Parser {
 }
 
 // Parse parses the CPU statistics of the system
-func (p *parser) Parse() (CpuStats, error) {
+func (p *parser) Parse(ctx context.Context) (CpuStats, error) {
 	switch p.execer.OS() {
 	case os.Darwin:
-		return p.parseForDarwin()
-	case os.Linux:
-		return p.parseForLinux()
-	case os.Windows:
-		return p.parseForWindows()
+		return p.parseForDarwin(ctx)
 	default:
 		return CpuStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
 	}
 }
 
 // parseForDarwin parses the CPU statistics of the system for Darwin
-func (p *parser) parseForDarwin() (CpuStats, error) {
+func (p *parser) parseForDarwin(ctx context.Context) (CpuStats, error) {
 	// Using -l 1 for a single snapshot
 	cmd, args := cmdAndArgs(os.Darwin)
 	cmdRes, err := p.execer.Exec(cmd, args...)
@@ -110,7 +107,7 @@ func cmdAndArgs(osystem string) (string, []string) {
 }
 
 // parseForLinux parses the CPU statistics of the system for Linux
-func (p *parser) parseForLinux() (CpuStats, error) {
+func (p *parser) parseForLinux(ctx context.Context) (CpuStats, error) {
 	// Using -b -n 1 for batch mode and a single snapshot
 	cmdRes, err := p.execer.Exec("top", "-b", "-n", "1")
 	if err != nil {
@@ -132,7 +129,7 @@ func (p *parser) parseForLinux() (CpuStats, error) {
 }
 
 // parseForWindows parses the CPU statistics of the system for Windows
-func (p *parser) parseForWindows() (CpuStats, error) {
+func (p *parser) parseForWindows(ctx context.Context) (CpuStats, error) {
 	// For Windows, wmic returns only CPU load
 	cmdRes, err := p.execer.Exec("wmic", "cpu", "get", "loadpercentage")
 	if err != nil {

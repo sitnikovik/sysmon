@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"time"
@@ -13,6 +14,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to parse input: %v", err)
 	}
+
+	ctx := context.Background()
 
 	// TODO: Implement the grpc server
 	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d", args.GrpcPort))
@@ -30,5 +33,5 @@ func main() {
 	// Запуск сбора статистикиn
 	n := time.Duration(flags.N) * time.Second
 	m := time.Duration(flags.M) * time.Second
-	run(n, m)
+	run(ctx, n, m)
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"strings"
@@ -59,7 +60,7 @@ func (m *metricsStringBuilder) Print() {
 }
 
 // run parses the metrics collection in real-time mode
-func run(interval time.Duration, duration time.Duration) {
+func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 	// Start the spinner and wait for the duration
 	spinnerCh := make(chan bool)
 	go spinner(duration, spinnerCh)
@@ -78,7 +79,7 @@ func run(interval time.Duration, duration time.Duration) {
 			res := NewMetricsStringBuilder()
 
 			// // Get the CPU statistics
-			cpuStats, err := cpu.NewParser(cmd.NewExecer()).Parse()
+			cpuStats, err := cpu.NewParser(cmd.NewExecer()).Parse(ctx)
 			res.append("CPU Usage                        ", cpuStats.String(), err)
 
 			// // // Get the Load Average statistics
@@ -90,7 +91,7 @@ func run(interval time.Duration, duration time.Duration) {
 			res.append("Memory", memoryStats.String(), err)
 
 			// // // Get the disk statistics
-			diskStats, err := disk.Parse()
+			diskStats, err := disk.NewParser(cmd.NewExecer()).Parse(ctx)
 			res.append("Disk Usage", diskStats.String(), err)
 
 			// /* Network metrics */

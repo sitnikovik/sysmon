@@ -2,7 +2,6 @@ package cpu
 
 import (
 	"fmt"
-	"runtime"
 	"strconv"
 	"strings"
 
@@ -60,15 +59,15 @@ func NewParser(execer cmd.Execer) Parser {
 
 // Parse parses the CPU statistics of the system
 func (p *parser) Parse() (CpuStats, error) {
-	switch runtime.GOOS {
-	case "darwin":
+	switch p.execer.OS() {
+	case os.Darwin:
 		return p.parseForDarwin()
-	case "linux":
+	case os.Linux:
 		return p.parseForLinux()
-	case "windows":
+	case os.Windows:
 		return p.parseForWindows()
 	default:
-		return CpuStats{}, fmt.Errorf("unsupported platform %s", runtime.GOOS)
+		return CpuStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
 	}
 }
 

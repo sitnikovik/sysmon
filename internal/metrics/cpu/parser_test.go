@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,7 +20,21 @@ func argsToInterfacesForOS(os string) []interface{} {
 	return res
 }
 
-func Test_parser_parseForDarwin(t *testing.T) {
+func TestNewParser(t *testing.T) {
+	t.Parallel()
+
+	t.Run("not nil on nil args", func(t *testing.T) {
+		t.Parallel()
+		assert.NotNil(t, NewParser(nil))
+	})
+
+	t.Run("with execer", func(t *testing.T) {
+		t.Parallel()
+		assert.NotNil(t, NewParser(cmd.NewExecer()))
+	})
+}
+
+func Test_parser_Parse(t *testing.T) {
 	t.Parallel()
 
 	type fields struct {
@@ -32,16 +47,20 @@ func Test_parser_parseForDarwin(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success",
+			name: "ok darwin",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
-
 					execer := cmd.NewMockExecer(t)
+
 					execer.EXPECT().
 						Exec(cmdByOS[os.Darwin], argsToInterfacesForOS(os.Darwin)...).
 						Return(&cmd.Result{
 							Bytes: []byte("CPU usage: 10.0% user, 20.0% sys, 70.0% idle"),
 						}, nil)
+
+					execer.EXPECT().
+						OS().
+						Return(os.Darwin)
 
 					return execer
 				},
@@ -52,6 +71,40 @@ func Test_parser_parseForDarwin(t *testing.T) {
 				Idle:   70.0,
 			},
 		},
+		{
+			name: "err darwin invalid cmd",
+			fields: fields{
+				execerMockFunc: func(t *testing.T) cmd.Execer {
+					execer := cmd.NewMockExecer(t)
+
+					execer.EXPECT().
+						Exec(cmdByOS[os.Darwin], argsToInterfacesForOS(os.Darwin)...).
+						Return(nil, errors.New("invalid cmd"))
+
+					execer.EXPECT().
+						OS().
+						Return(os.Darwin)
+
+					return execer
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "err unsupported os",
+			fields: fields{
+				execerMockFunc: func(t *testing.T) cmd.Execer {
+					execer := cmd.NewMockExecer(t)
+
+					execer.EXPECT().
+						OS().
+						Return("testOS")
+
+					return execer
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -61,7 +114,7 @@ func Test_parser_parseForDarwin(t *testing.T) {
 			p := &parser{
 				execer: tt.fields.execerMockFunc(t),
 			}
-			got, err := p.parseForDarwin()
+			got, err := p.Parse()
 
 			assert.Equal(t, tt.want, got)
 			if tt.wantErr {

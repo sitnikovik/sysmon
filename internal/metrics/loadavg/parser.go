@@ -15,6 +15,7 @@ var (
 
 // Parser represents the parser to get load average statistics
 type Parser interface {
+	// Parse parses the load average of the system
 	Parse(ctx context.Context) (LoadAverageStats, error)
 }
 

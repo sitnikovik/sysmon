@@ -82,14 +82,14 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 
 			// // Get the CPU statistics
 			cpuStats, err := cpu.NewParser(cmd.NewExecer()).Parse(ctx)
-			res.append("CPU Usage                        ", cpuStats.String(), err)
+			res.append("CPU Usage", cpuStats.String(), err)
 
 			// // // Get the Load Average statistics
 			loadAvgStats, err := loadavg.NewParser(cmd.NewExecer()).Parse(ctx)
 			res.append("Load Average", loadAvgStats.String(), err)
 
 			// // // Get the Memory statistics
-			memoryStats, err := memory.Parse()
+			memoryStats, err := memory.NewParser(cmd.NewExecer()).Parse(ctx)
 			res.append("Memory", memoryStats.String(), err)
 
 			// // // Get the disk statistics

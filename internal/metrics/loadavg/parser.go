@@ -1,12 +1,34 @@
 package loadavg
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils"
+	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
+	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 )
+
+var (
+	cmdUnix string = "uptime"
+)
+
+// Parser represents the parser to get load average statistics
+type Parser interface {
+	Parse(ctx context.Context) (LoadAverageStats, error)
+}
+
+// parser is an implementation of Parser
+type parser struct {
+	execer cmd.Execer
+}
+
+// NewParser returns a new instance of Parser
+func NewParser(execer cmd.Execer) Parser {
+	return &parser{
+		execer: execer,
+	}
+}
 
 // LoadAverageStats represents the system load average
 type LoadAverageStats struct {
@@ -24,24 +46,11 @@ func (l LoadAverageStats) String() string {
 }
 
 // Parse parses the load average of the system
-func Parse() (LoadAverageStats, error) {
-	lines, err := utils.RunCmdToStrings("uptime")
-	if err != nil {
-		return LoadAverageStats{}, err
-	}
-	if len(lines) != 2 {
-		return LoadAverageStats{}, errors.New("invalid output")
+func (p *parser) Parse(ctx context.Context) (LoadAverageStats, error) {
+	switch p.execer.OS() {
+	case os.Darwin, os.Linux:
+		return p.parseForUnix(ctx)
 	}
 
-	res := LoadAverageStats{}
-	parts := strings.Split(lines[0], "load averages:")
-	if len(parts) < 2 {
-		return LoadAverageStats{}, errors.New("failed to find load averages in output")
-	}
-	_, err = fmt.Sscanf(parts[1], "%f %f %f", &res.OneMinute, &res.FiveMinute, &res.FifteenMinute)
-	if err != nil {
-		return LoadAverageStats{}, fmt.Errorf("error parsing load averages: %w", err)
-	}
-
-	return res, err
+	return LoadAverageStats{}, fmt.Errorf("unsupported OS: %s", p.execer.OS())
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"runtime"
 	"strings"
 	"sync"
@@ -37,7 +38,8 @@ func NewMetricsStringBuilder() *metricsStringBuilder {
 // or print the error if the metric parsing failed
 func (m *metricsStringBuilder) append(metricName, s string, err error) {
 	if err != nil {
-		fmt.Printf("ERROR: failed to parse %s: %s\n", metricName, err)
+		log.Fatalf("ERROR: failed to parse %s: %s\n", metricName, err)
+		// fmt.Printf("ERROR: failed to parse %s: %s\n", metricName, err)
 		return
 	}
 
@@ -83,7 +85,7 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 			res.append("CPU Usage                        ", cpuStats.String(), err)
 
 			// // // Get the Load Average statistics
-			loadAvgStats, err := loadavg.Parse()
+			loadAvgStats, err := loadavg.NewParser(cmd.NewExecer()).Parse(ctx)
 			res.append("Load Average", loadAvgStats.String(), err)
 
 			// // // Get the Memory statistics

@@ -6,18 +6,19 @@ import (
 	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 // parseForDarwin parses the CPU statistics of the system for Darwin
-func (p *parser) parseForDarwin(ctx context.Context) (CpuStats, error) {
+func (p *parser) parseForDarwin(ctx context.Context) (models.CpuStats, error) {
 	// Using -l 1 for a single snapshot
 	cmd, args := cmdAndArgs(os.Darwin)
 	cmdRes, err := p.execer.Exec(cmd, args...)
 	if err != nil {
-		return CpuStats{}, err
+		return models.CpuStats{}, err
 	}
 
-	res := CpuStats{}
+	res := models.CpuStats{}
 	for _, line := range cmdRes.Lines() {
 		if strings.Contains(line, "CPU usage:") {
 			parts := strings.Fields(line)

@@ -48,23 +48,23 @@ func NewParser(execer cmd.Execer) Parser {
 // MemoryStats defines the memory statistics
 type MemoryStats struct {
 	// Total shows the total memory in MB
-	Total int
+	Total int `json:"total"`
 	// Available shows how much memory in MB is available for new processes.
-	Available int
+	Available int `json:"available"`
 	// Free shows how much memory in MB is available for new processes.
 	// If this value is high, it means that the system has some spare memory,
 	// allowing more applications to run without having to free up memory.
-	Free int
+	Free int `json:"free"`
 	// Active shows how much memory in MB that are currently being actively used by processes.
 	// These pages contain data that is actively being read or written.
-	Active int
+	Active int `json:"active"`
 	// Inactive shows how much memory in MB that were previously used but are not currently active.
 	// These pages may contain data that is not used, but can be restored to the active state if necessary.
-	Inactive int
+	Inactive int `json:"inactive"`
 	// Wired shows how much memory in MB  that are hard-locked in RAM and cannot be paged out or released.
 	// These are usually mission-critical pages that are used by the operating system kernel or drivers,
 	// and they are necessary for the system to work.
-	Wired int
+	Wired int `json:"wired"`
 }
 
 // String returns a string representation of the MemoryStats

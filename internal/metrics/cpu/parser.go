@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sitnikovik/sysmon/internal/metrics/utils"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 var (
@@ -23,25 +23,9 @@ var (
 	}
 )
 
-// CpuStats defines the CPU statistics
-type CpuStats struct {
-	User   float64 // Percentage of CPU time spent in user space
-	System float64 // Percentage of CPU time spent in kernel space
-	Idle   float64 // Percentage of CPU time spent idle
-}
-
-// String returns a string representation of the CpuStats
-func (c CpuStats) String() string {
-	header := fmt.Sprintf("%-10s %-10s %-10s\n", "User", "System", "Idle")
-	values := fmt.Sprintf("%-10.2f %-10.2f %-10.2f", c.User, c.System, c.Idle)
-
-	return utils.BoldText(header) + utils.GrayText(values)
-	// return fmt.Sprintf("User: %.2f%%, System: %.2f%%, Idle: %.2f%%", c.User, c.System, c.Idle)
-}
-
 // Parser defines the interface for parsing CPU statistics
 type Parser interface {
-	Parse(ctx context.Context) (CpuStats, error)
+	Parse(ctx context.Context) (models.CpuStats, error)
 }
 
 // parser - struct to hold the parser dependencies
@@ -57,12 +41,12 @@ func NewParser(execer cmd.Execer) Parser {
 }
 
 // Parse parses the CPU statistics of the system
-func (p *parser) Parse(ctx context.Context) (CpuStats, error) {
+func (p *parser) Parse(ctx context.Context) (models.CpuStats, error) {
 	switch p.execer.OS() {
 	case os.Darwin:
 		return p.parseForDarwin(ctx)
 	default:
-		return CpuStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
+		return models.CpuStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
 	}
 }
 

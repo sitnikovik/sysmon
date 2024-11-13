@@ -15,6 +15,8 @@ import (
 	"github.com/sitnikovik/sysmon/internal/metrics/memory"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
+	"github.com/sitnikovik/sysmon/internal/models"
+	storage "github.com/sitnikovik/sysmon/internal/storage/metrics"
 )
 
 // metricsStringBuilder is a helper struct for building the metrics output
@@ -71,6 +73,10 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 	var wg sync.WaitGroup
 	ticker := time.NewTicker(interval)
 
+	// Create a new storage instance to store the metrics
+	storage := storage.NewStorage()
+
+	// Clear the cli screen before printing the metrics
 	clearScreen()
 
 	for range ticker.C {
@@ -106,7 +112,15 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 
 			// Get the connections statistics
 			// connStat, err := connections.Parse()
-			// res.append("Connections                                                        ", connStat.String(), err)
+			// res.append("Connections", connStat.String(), err)
+
+			// Store the metrics
+			err = storage.Set(ctx, models.Metrics{
+				CpuStats: cpuStats,
+			})
+			if err != nil {
+				log.Fatalf("%s: failed to store the metrics: %s\n", utils.BgRedText("ERROR"), err)
+			}
 
 			// Print the metrics output
 			res.Print()

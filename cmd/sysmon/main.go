@@ -4,34 +4,20 @@ package main
 
 import (
 	"context"
-	"log"
-	"os"
+	"flag"
 	"time"
 )
 
 func main() {
-	_, flags, err := ParseInput(os.Args)
-	if err != nil {
-		log.Fatalf("failed to parse input: %v", err)
-	}
+	// Input flags
+	var n, m int
+	flag.IntVar(&n, "n", 5, "Period of time to output the metrics")
+	flag.IntVar(&m, "m", 15, "Snapshot interval between metric collection")
 
 	ctx := context.Background()
 
-	// TODO: Implement the grpc server
-	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d", args.GrpcPort))
-	// if err != nil {
-	// 	log.Fatalf("failed to listen: %v", err)
-	// }
-	// s := grpc.NewServer()
-	// pb.RegisterSystemStatsServer(s, &server{})
-
-	// log.Println("gRPC server listening on port " + grpcPort)
-	// if err := s.Serve(lis); err != nil {
-	// 	log.Fatalf("failed to serve: %v", err)
-	// }
-
-	// Запуск сбора статистикиn
-	n := time.Duration(flags.N) * time.Second
-	m := time.Duration(flags.M) * time.Second
-	run(ctx, n, m)
+	// Collect and print the system metrics
+	interval := time.Duration(n) * time.Second
+	duration := time.Duration(m) * time.Second
+	run(ctx, interval, duration)
 }

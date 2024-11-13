@@ -43,10 +43,10 @@ func ParseInput(args []string) (*Args, *Flags, error) {
 		}
 
 		// Parse arguments
-		// err = parseArg(aa, arg)
-		// if err != nil {
-		// 	return nil, nil, err
-		// }
+		err = parseArg(aa, arg)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	return aa, ff, nil
@@ -84,7 +84,6 @@ func parseFlag(flags *Flags, in string) (bool, error) {
 }
 
 func parseArg(args *Args, in string) error {
-
 	port, err := strconv.Atoi(in)
 	if err != nil {
 		return fmt.Errorf("port err: %w", err)

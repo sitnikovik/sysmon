@@ -10,6 +10,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/strings"
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 func TestNewParser(t *testing.T) {
@@ -39,7 +40,7 @@ func Test_parser_Parse(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    CpuStats
+		want    models.CpuStats
 		wantErr bool
 	}{
 		{
@@ -64,7 +65,7 @@ func Test_parser_Parse(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: CpuStats{
+			want: models.CpuStats{
 				User:   10.0,
 				System: 20.0,
 				Idle:   70.0,

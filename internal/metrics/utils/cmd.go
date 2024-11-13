@@ -73,6 +73,11 @@ func BgGreenText(text string) string {
 	return fmt.Sprintf("\033[42m%s\033[0m", text)
 }
 
+// BgRedText returns a text with red background
+func BgRedText(text string) string {
+	return fmt.Sprintf("\033[41m%s\033[0m", text)
+}
+
 // GrayText returns a gray text
 func GrayText(text string) string {
 	return fmt.Sprintf("\033[90m%s\033[0m", text)

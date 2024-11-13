@@ -8,28 +8,70 @@ service SystemStats {
     rpc GetStats (StatsRequest) returns (StatsResponse) {}
 }
 
-message StatsRequest {
-    int32 N = 1; // Период обновления статистики (в секундах)
-    int32 M = 2; // Усредненный интервал (в секундах)
-}
+message StatsRequest {}
 
 message StatsResponse {
-    double load_average = 1;
-    double cpu_user_mode = 2;
-    double cpu_system_mode = 3;
-    double cpu_idle = 4;
-    DiskStats disk_stats = 5;
-    repeated NetworkStats network_stats = 6;
+    CPUStats cpu = 1;
+
+    // Represents the CPU statistics
+    message CPUStats {
+        // Percentage of CPU time spent in user space
+        double user = 1;
+        // Percentage of CPU time spent in kernel space
+        double system = 2;
+        // Percentage of CPU time spent idle
+        double idle = 3;
+    }
+
+    // Represents the disk statistics
+    message Disk {
+	    // Number of reads per second
+        double reads = 1;
+        // Number of writes per second
+        double writes = 2;
+        // Number of kilobytes read+write per second
+        double readWriteKB = 3;
+        // Total disk space in MB
+        double totalMB = 4;
+        // Used disk space in MB
+        double usedMB = 5;
+        // Used disk space in percentage
+        double usedPercent = 6;
+        // Number of used inodes
+        double usedInodes = 7;
+        // Used inodes in percentage
+        double usedInodesPercent = 8;
+    }
+
+    message Memory {
+        // Total memory in MB
+        double totalMB = 1;
+        // Available memory in MB shows how much memory in MB is available for new processes.
+        double availableMB = 2;
+        // Free memory in MB shows how much memory in MB is available for new processes.
+        // If this value is high, it means that the system has some spare memory,
+        // allowing more applications to run without having to free up memory.
+        double freeMB = 3;
+        // Active memory in MB hows how much memory in MB that are currently being actively used by processes.
+	    // These pages contain data that is actively being read or written.
+        double activeMB = 4;
+        // Inactive shows how much memory in MB that were previously used but are not currently active.
+	    // These pages may contain data that is not used, but can be restored to the active state if necessary.
+        double inactiveMB = 5;
+        // Wired shows how much memory in MB  that are hard-locked in RAM and cannot be paged out or released.
+        // These are usually mission-critical pages that are used by the operating system kernel or drivers,
+        // and they are necessary for the system to work.
+        double WiredMB = 6;
+    }
+
+    // Represents the system load average
+    message LoadAverage {
+        // Average load for the last minute
+        double oneMin = 1;
+        // Average load for the last five minutes
+        double fiveMin = 2;
+        // Average load for the last fifteen minutes
+        double fifteenMin = 3;
+    }
 }
 
-message DiskStats {
-    double tps = 1;
-    double kb_per_sec = 2;
-}
-
-message NetworkStats {
-    string protocol = 1;
-    string source = 2;
-    string destination = 3;
-    int64 bytes_per_sec = 4;
-}

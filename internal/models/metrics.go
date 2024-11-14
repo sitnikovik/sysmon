@@ -7,6 +7,6 @@ type Metrics struct {
 	DiskStats DiskStats `json:"diskStats"`
 	// MemoryStats is the memory statistics
 	MemoryStats MemoryStats `json:"memoryStats"`
-	// LoadAvgStats is the load average statistics
-	LoadAvgStats LoadAverageStats `json:"loadAvgStats"`
+	// LoadAverageStats is the load average statistics
+	LoadAverageStats LoadAverageStats `json:"loadAvgStats"`
 }

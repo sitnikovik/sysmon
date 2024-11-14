@@ -67,9 +67,9 @@ func metricsToStatsResponse(m models.Metrics) *v1.StatsResponse {
 			WiredMB:     m.MemoryStats.WiredMB,
 		},
 		LoadAverage: &v1.StatsResponse_LoadAverage{
-			OneMin:     m.LoadAvgStats.OneMin,
-			FiveMin:    m.LoadAvgStats.FiveMin,
-			FifteenMin: m.LoadAvgStats.FifteenMin,
+			OneMin:     m.LoadAverageStats.OneMin,
+			FiveMin:    m.LoadAverageStats.FiveMin,
+			FifteenMin: m.LoadAverageStats.FifteenMin,
 		},
 	}
 }

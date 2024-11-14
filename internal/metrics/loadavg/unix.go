@@ -16,7 +16,7 @@ func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error
 	}
 
 	lines := cmdRes.Lines()
-	if len(lines) == 0 || len(lines) < 2 {
+	if len(lines) == 0 || len(lines) > 2 {
 		return models.LoadAverageStats{}, fmt.Errorf("invalid output length %d", len(lines))
 	}
 

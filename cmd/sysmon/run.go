@@ -91,8 +91,8 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 			res.append("CPU Usage", cpuStats.String(), err)
 
 			// // // Get the Load Average statistics
-			loadAvgStats, err := loadavg.NewParser(cmd.NewExecer()).Parse(ctx)
-			res.append("Load Average", loadAvgStats.String(), err)
+			loadAverageStats, err := loadavg.NewParser(cmd.NewExecer()).Parse(ctx)
+			res.append("Load Average", loadAverageStats.String(), err)
 
 			// // // Get the Memory statistics
 			memoryStats, err := memory.NewParser(cmd.NewExecer()).Parse(ctx)
@@ -114,10 +114,10 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 
 			// Store the metrics
 			err = storage.Set(ctx, models.Metrics{
-				CpuStats:     cpuStats,
-				DiskStats:    diskStats,
-				MemoryStats:  memoryStats,
-				LoadAvgStats: loadAvgStats,
+				CpuStats:         cpuStats,
+				DiskStats:        diskStats,
+				MemoryStats:      memoryStats,
+				LoadAverageStats: loadAverageStats,
 			})
 			if err != nil {
 				log.Fatalf("%s: failed to store the metrics: %s\n", utils.BgRedText("ERROR"), err)

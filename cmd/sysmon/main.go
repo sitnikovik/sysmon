@@ -9,11 +9,19 @@ import (
 	"time"
 )
 
+var (
+	// interval is the interval of time to output the metrics
+	interval int
+	// margin is the margin of time between statistics output
+	margin int
+	// grpcPort is the gRPC port to connect to
+	grpcPort int
+)
+
 func main() {
 	// Input flags
-	var n, m, grpcPort int
-	flag.IntVar(&n, "n", 5, "Period of time to output the metrics")
-	flag.IntVar(&m, "m", 15, "Snapshot interval between metric collection")
+	flag.IntVar(&interval, "n", 5, "Interval of time to output the metrics")
+	flag.IntVar(&margin, "m", 15, "Margin of time between statistics output")
 	flag.IntVar(&grpcPort, "grpc-port", 50051, "gRPC port")
 	flag.Parse()
 
@@ -26,7 +34,7 @@ func main() {
 	}()
 
 	// Collect and print the system metrics
-	interval := time.Duration(n) * time.Second
-	duration := time.Duration(m) * time.Second
-	run(ctx, interval, duration)
+	n := time.Duration(interval) * time.Second
+	m := time.Duration(margin) * time.Second
+	run(ctx, n, m)
 }

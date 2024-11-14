@@ -26,11 +26,14 @@ type metricsStringBuilder struct {
 
 func NewMetricsStringBuilder() *metricsStringBuilder {
 	m := &metricsStringBuilder{}
-	m.sb.WriteString("System Information\n")
 	m.sb.WriteString(fmt.Sprintf("OS: %s\n", runtime.GOOS))
 	m.sb.WriteString(fmt.Sprintf("Architecture: %s\n", runtime.GOARCH))
 	m.sb.WriteString(fmt.Sprintf("CPUs: %d\n", runtime.NumCPU()))
 	m.sb.WriteString(fmt.Sprintf("Go Version: %s\n", runtime.Version()))
+	m.sb.WriteString("\n")
+	m.sb.WriteString(fmt.Sprintf("Snapshot interval: %d sec\n", interval))
+	m.sb.WriteString(fmt.Sprintf("Snapshot margin: %d sec\n", margin))
+	m.sb.WriteString(fmt.Sprintf("gRPC server is listening on port: %d\n", grpcPort))
 	m.sb.WriteString("--------------------\n")
 
 	return m
@@ -40,8 +43,7 @@ func NewMetricsStringBuilder() *metricsStringBuilder {
 // or print the error if the metric parsing failed
 func (m *metricsStringBuilder) append(metricName, s string, err error) {
 	if err != nil {
-		log.Fatalf("ERROR: failed to parse %s: %s\n", metricName, err)
-		// fmt.Printf("ERROR: failed to parse %s: %s\n", metricName, err)
+		log.Fatalf("%s: failed to parse %s: %s\n", utils.BgRedText("ERROR"), metricName, err)
 		return
 	}
 
@@ -86,33 +88,28 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 			// Builder for storing the metrics output to be printed
 			res := NewMetricsStringBuilder()
 
-			// // Get the CPU statistics
-			cpuStats, err := cpu.NewParser(cmd.NewExecer()).Parse(ctx)
+			execer := cmd.NewExecer()
+
+			cpuStats, err := cpu.NewParser(execer).Parse(ctx)
 			res.append("CPU Usage", cpuStats.String(), err)
 
-			// // // Get the Load Average statistics
-			loadAverageStats, err := loadavg.NewParser(cmd.NewExecer()).Parse(ctx)
+			loadAverageStats, err := loadavg.NewParser(execer).Parse(ctx)
 			res.append("Load Average", loadAverageStats.String(), err)
 
-			// // // Get the Memory statistics
-			memoryStats, err := memory.NewParser(cmd.NewExecer()).Parse(ctx)
+			memoryStats, err := memory.NewParser(execer).Parse(ctx)
 			res.append("Memory", memoryStats.String(), err)
 
-			// // // Get the disk statistics
-			diskStats, err := disk.NewParser(cmd.NewExecer()).Parse(ctx)
+			diskStats, err := disk.NewParser(execer).Parse(ctx)
 			res.append("Disk Usage", diskStats.String(), err)
 
-			// // Get the network statistics
 			// netStats, err := net.Parse()
 			// res.append("Network", netStats.String(), err)
 
 			// Get the traffic statistics
 
-			// Get the connections statistics
 			// connStat, err := connections.Parse()
 			// res.append("Connections", connStat.String(), err)
 
-			// Store the metrics
 			err = storage.Set(ctx, models.Metrics{
 				CpuStats:         cpuStats,
 				DiskStats:        diskStats,
@@ -123,7 +120,6 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 				log.Fatalf("%s: failed to store the metrics: %s\n", utils.BgRedText("ERROR"), err)
 			}
 
-			// Print the metrics output
 			res.Print()
 		}()
 	}

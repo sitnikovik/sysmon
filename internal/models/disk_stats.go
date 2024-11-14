@@ -6,6 +6,9 @@ import (
 	"github.com/sitnikovik/sysmon/internal/metrics/utils"
 )
 
+// fmtDiskStats is the format for the disk statistics
+const fmtDiskStats = "%-10s %-10s %-20s %-20s %-20s %-20s"
+
 // DiskStats represents the disk statistics
 type DiskStats struct {
 	// Reads show the number of reads per second
@@ -28,16 +31,16 @@ type DiskStats struct {
 
 // String returns a string representation of the DiskStats
 func (d DiskStats) String() string {
-	header := utils.BoldText((fmt.Sprintf("%-10s %-10s %-20s %-20s %-20s %-20s\n",
+	header := utils.BoldText(fmt.Sprintf(fmtDiskStats+"\n",
 		"Reads/s",
 		"Writes/s",
 		"KB Read+Write/s",
 		"Total",
 		"Used",
 		"Used Inodes",
-	)))
+	))
 
-	values := utils.GrayText(fmt.Sprintf("%-10s %-10s %-20s %-20s %-20s %-20s",
+	values := utils.GrayText(fmt.Sprintf(fmtDiskStats,
 		utils.BeatifyNumber(d.Reads),
 		utils.BeatifyNumber(d.Writes),
 		utils.BeatifyNumber(d.ReadWriteKB)+" KB/s",

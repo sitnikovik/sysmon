@@ -18,7 +18,7 @@ run-ubuntu:
 	docker-compose up --build ubuntu
 
 build:
-	go build -o bin/sysmon cmd/sysmon/main.go
+	go build -o bin/sysmon ./cmd/sysmon/
 
 tests:
 	go test ./... -race -count 100

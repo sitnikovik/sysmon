@@ -8,6 +8,7 @@ import (
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 func Test_parser_Parse(t *testing.T) {
@@ -23,7 +24,7 @@ func Test_parser_Parse(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    LoadAverageStats
+		want    models.LoadAverageStats
 		wantErr bool
 	}{
 		{
@@ -48,10 +49,10 @@ func Test_parser_Parse(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: LoadAverageStats{
-				OneMinute:     3.99,
-				FiveMinute:    3.95,
-				FifteenMinute: 3.58,
+			want: models.LoadAverageStats{
+				OneMin:     3.99,
+				FiveMin:    3.95,
+				FifteenMin: 3.58,
 			},
 			wantErr: false,
 		},
@@ -77,10 +78,10 @@ func Test_parser_Parse(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: LoadAverageStats{
-				OneMinute:     3.99,
-				FiveMinute:    3.95,
-				FifteenMinute: 3.58,
+			want: models.LoadAverageStats{
+				OneMin:     3.99,
+				FiveMin:    3.95,
+				FifteenMin: 3.58,
 			},
 			wantErr: false,
 		},

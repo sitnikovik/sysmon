@@ -102,13 +102,11 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 			diskStats, err := disk.NewParser(cmd.NewExecer()).Parse(ctx)
 			res.append("Disk Usage", diskStats.String(), err)
 
-			// /* Network metrics */
 			// // Get the network statistics
 			// netStats, err := net.Parse()
 			// res.append("Network", netStats.String(), err)
 
 			// Get the traffic statistics
-			/* Network metrics */
 
 			// Get the connections statistics
 			// connStat, err := connections.Parse()
@@ -116,9 +114,10 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 
 			// Store the metrics
 			err = storage.Set(ctx, models.Metrics{
-				CpuStats:    cpuStats,
-				DiskStats:   diskStats,
-				MemoryStats: memoryStats,
+				CpuStats:     cpuStats,
+				DiskStats:    diskStats,
+				MemoryStats:  memoryStats,
+				LoadAvgStats: loadAvgStats,
 			})
 			if err != nil {
 				log.Fatalf("%s: failed to store the metrics: %s\n", utils.BgRedText("ERROR"), err)

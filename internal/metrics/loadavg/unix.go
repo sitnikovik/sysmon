@@ -5,27 +5,29 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-func (p *parser) parseForUnix(_ context.Context) (LoadAverageStats, error) {
+func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error) {
 	cmdRes, err := p.execer.Exec(cmdUnix)
 	if err != nil {
-		return LoadAverageStats{}, err
+		return models.LoadAverageStats{}, err
 	}
 
 	lines := cmdRes.Lines()
 	if len(lines) == 0 || len(lines) < 2 {
-		return LoadAverageStats{}, fmt.Errorf("invalid output length %d", len(lines))
+		return models.LoadAverageStats{}, fmt.Errorf("invalid output length %d", len(lines))
 	}
 
-	res := LoadAverageStats{}
+	res := models.LoadAverageStats{}
 	parts := strings.Split(lines[0], "load averages:")
 	if len(parts) < 2 {
-		return LoadAverageStats{}, errors.New("failed to find load averages in output")
+		return models.LoadAverageStats{}, errors.New("failed to find load averages in output")
 	}
-	_, err = fmt.Sscanf(parts[1], "%f %f %f", &res.OneMinute, &res.FiveMinute, &res.FifteenMinute)
+	_, err = fmt.Sscanf(parts[1], "%f %f %f", &res.OneMin, &res.FiveMin, &res.FifteenMin)
 	if err != nil {
-		return LoadAverageStats{}, fmt.Errorf("error parsing load averages: %w", err)
+		return models.LoadAverageStats{}, fmt.Errorf("error parsing load averages: %w", err)
 	}
 
 	return res, err

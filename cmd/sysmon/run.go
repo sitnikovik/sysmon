@@ -116,8 +116,9 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 
 			// Store the metrics
 			err = storage.Set(ctx, models.Metrics{
-				CpuStats:  cpuStats,
-				DiskStats: diskStats,
+				CpuStats:    cpuStats,
+				DiskStats:   diskStats,
+				MemoryStats: memoryStats,
 			})
 			if err != nil {
 				log.Fatalf("%s: failed to store the metrics: %s\n", utils.BgRedText("ERROR"), err)

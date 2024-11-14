@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 func Test_parser_Parse(t *testing.T) {
@@ -22,7 +23,7 @@ func Test_parser_Parse(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    MemoryStats
+		want    models.MemoryStats
 		wantErr bool
 	}{
 		{
@@ -69,13 +70,13 @@ func Test_parser_Parse(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: MemoryStats{
-				Total:     26842,
-				Available: 12277,
-				Free:      151,
-				Active:    12140,
-				Inactive:  12126,
-				Wired:     2421,
+			want: models.MemoryStats{
+				TotalMB:     26842,
+				AvailableMB: 12277,
+				FreeMB:      151,
+				ActiveMB:    12140,
+				InactiveMB:  12126,
+				WiredMB:     2421,
 			},
 		},
 	}

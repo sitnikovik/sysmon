@@ -4,18 +4,20 @@ import (
 	"context"
 	"fmt"
 	"strings"
+
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 // parseForDarwin parses the memory statistics for Darwin OS
-func (p *parser) parseForDarwin(_ context.Context) (MemoryStats, error) {
+func (p *parser) parseForDarwin(_ context.Context) (models.MemoryStats, error) {
 	cmdRes, err := p.execer.Exec(cmdDarwin)
 	if err != nil {
-		return MemoryStats{}, err
+		return models.MemoryStats{}, err
 	}
 
 	lines := cmdRes.Lines()
-	var pageSizeB int = 4096 // Default page size
-	var free, active, inactive, speculativel, wired, throttled int
+	var pageSizeB uint64 = 4096 // Default page size
+	var free, active, inactive, speculativel, wired, throttled uint64
 
 	for _, line := range lines {
 		if strings.Contains(line, "page size of") {
@@ -41,12 +43,12 @@ func (p *parser) parseForDarwin(_ context.Context) (MemoryStats, error) {
 		}
 	}
 
-	return MemoryStats{
-		Total:     int(pagesToMB(free+active+inactive+speculativel+wired+throttled, pageSizeB)),
-		Available: int(pagesToMB(free+inactive, pageSizeB)),
-		Free:      int(pagesToMB(free, pageSizeB)),
-		Active:    int(pagesToMB(active, pageSizeB)),
-		Inactive:  int(pagesToMB(inactive, pageSizeB)),
-		Wired:     int(pagesToMB(wired, pageSizeB)),
+	return models.MemoryStats{
+		TotalMB:     pagesToMB(free+active+inactive+speculativel+wired+throttled, pageSizeB),
+		AvailableMB: pagesToMB(free+inactive, pageSizeB),
+		FreeMB:      pagesToMB(free, pageSizeB),
+		ActiveMB:    pagesToMB(active, pageSizeB),
+		InactiveMB:  pagesToMB(inactive, pageSizeB),
+		WiredMB:     pagesToMB(wired, pageSizeB),
 	}, nil
 }

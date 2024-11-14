@@ -58,5 +58,13 @@ func metricsToStatsResponse(m models.Metrics) *v1.StatsResponse {
 			UsedInodes:        m.DiskStats.UsedInodes,
 			UsedInodesPercent: m.DiskStats.UsedInodesPercent,
 		},
+		Memory: &v1.StatsResponse_Memory{
+			TotalMB:     m.MemoryStats.TotalMB,
+			AvailableMB: m.MemoryStats.AvailableMB,
+			FreeMB:      m.MemoryStats.FreeMB,
+			ActiveMB:    m.MemoryStats.ActiveMB,
+			InactiveMB:  m.MemoryStats.InactiveMB,
+			WiredMB:     m.MemoryStats.WiredMB,
+		},
 	}
 }

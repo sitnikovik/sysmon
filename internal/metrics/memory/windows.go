@@ -6,16 +6,17 @@ import (
 	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils"
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 // parseForWindows parses the memory statistics for Windows OS
-func (p *parser) parseForWindows(_ context.Context) (MemoryStats, error) {
+func (p *parser) parseForWindows(_ context.Context) (models.MemoryStats, error) {
 	lines, err := utils.RunCmdToStrings("wmic", "os", "get", "FreePhysicalMemory,TotalVisibleMemorySize")
 	if err != nil {
-		return MemoryStats{}, err
+		return models.MemoryStats{}, err
 	}
 
-	var free, total int
+	var free, total uint64
 	for _, line := range lines {
 		// TODO: Implement others memory stats like Active, Inactive, Wired
 		if strings.HasPrefix(line, "FreePhysicalMemory") {
@@ -23,8 +24,8 @@ func (p *parser) parseForWindows(_ context.Context) (MemoryStats, error) {
 		}
 	}
 
-	return MemoryStats{
-		Free:   free / 1024,
-		Active: (total - free) / 1024,
+	return models.MemoryStats{
+		FreeMB:   free / 1024,
+		ActiveMB: (total - free) / 1024,
 	}, nil
 }

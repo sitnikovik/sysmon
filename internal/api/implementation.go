@@ -3,19 +3,27 @@ package server
 import (
 	"context"
 
-	"github.com/sitnikovik/sysmon/internal/storage/metrics"
+	"github.com/sitnikovik/sysmon/internal/models"
 	v1 "github.com/sitnikovik/sysmon/pkg/v1/api"
 )
+
+// Storage defines the interface for storing the metrics of the system
+type Storage interface {
+	// Get returns the metrics of the system from the storage
+	Get(ctx context.Context) (models.Metrics, error)
+	// Set stores the metrics of the system
+	Set(ctx context.Context, m models.Metrics) error
+}
 
 type Implementation struct {
 	v1.UnimplementedSystemStatsServer
 
 	// storage for the metrics
-	storage metrics.Storage
+	storage Storage
 }
 
 // NewImplementation returns a new instance of the API Implementation
-func NewImplementation(storage metrics.Storage) *Implementation {
+func NewImplementation(storage Storage) *Implementation {
 	return &Implementation{
 		storage: storage,
 	}

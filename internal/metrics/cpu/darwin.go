@@ -10,7 +10,7 @@ import (
 )
 
 // parseForDarwin parses the CPU statistics of the system for Darwin
-func (p *parser) parseForDarwin(ctx context.Context) (models.CpuStats, error) {
+func (p *parser) parseForDarwin(_ context.Context) (models.CpuStats, error) {
 	// Using -l 1 for a single snapshot
 	cmd, args := cmdAndArgs(os.Darwin)
 	cmdRes, err := p.execer.Exec(cmd, args...)

@@ -9,6 +9,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/strings"
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 func Test_parser_Parse(t *testing.T) {
@@ -24,7 +25,7 @@ func Test_parser_Parse(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    DiskStats
+		want    models.DiskStats
 		wantErr bool
 	}{
 		{
@@ -73,7 +74,7 @@ func Test_parser_Parse(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: DiskStats{
+			want: models.DiskStats{
 				Reads:             10,
 				Writes:            20,
 				ReadWriteKB:       10*32 + 20*64,

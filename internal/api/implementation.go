@@ -37,14 +37,26 @@ func (i *Implementation) GetStats(ctx context.Context, _ *v1.StatsRequest) (*v1.
 		return nil, err
 	}
 
-	// Convert the metrics to the response
-	res := &v1.StatsResponse{
-		Cpu: &v1.StatsResponse_CPUStats{
+	return metricsToStatsResponse(m), nil
+}
+
+// metricsToStatsResponse converts the metrics to the StatsResponse
+func metricsToStatsResponse(m models.Metrics) *v1.StatsResponse {
+	return &v1.StatsResponse{
+		Cpu: &v1.StatsResponse_CPU{
 			User:   m.CpuStats.User,
 			System: m.CpuStats.System,
 			Idle:   m.CpuStats.Idle,
 		},
+		Disk: &v1.StatsResponse_Disk{
+			Reads:             m.DiskStats.Reads,
+			Writes:            m.DiskStats.Writes,
+			ReadWriteKB:       m.DiskStats.ReadWriteKB,
+			TotalMB:           m.DiskStats.TotalMB,
+			UsedMB:            m.DiskStats.UsedMB,
+			UsedPercent:       m.DiskStats.UsedPercent,
+			UsedInodes:        m.DiskStats.UsedInodes,
+			UsedInodesPercent: m.DiskStats.UsedInodesPercent,
+		},
 	}
-
-	return res, nil
 }

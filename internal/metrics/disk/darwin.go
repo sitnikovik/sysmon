@@ -5,36 +5,38 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+
+	"github.com/sitnikovik/sysmon/internal/models"
 )
 
 // parseForDarwin parses the disk statistics for Darwin OS
-func (p *parser) parseForDarwin(ctx context.Context) (DiskStats, error) {
-	var res DiskStats
+func (p *parser) parseForDarwin(ctx context.Context) (models.DiskStats, error) {
+	var res models.DiskStats
 	var err error
 
 	// Getting the disk load
 	err = p.parseDiskLoadForDarwin(ctx, &res)
 	if err != nil {
-		return DiskStats{}, err
+		return models.DiskStats{}, err
 	}
 
 	// Getting the disk space
 	err = p.parseDiskSpaceForDarwin(ctx, &res)
 	if err != nil {
-		return DiskStats{}, err
+		return models.DiskStats{}, err
 	}
 
 	// Getting the disk space as inodes
 	err = p.parseDiskSpaseAsInodesForDarwin(ctx, &res)
 	if err != nil {
-		return DiskStats{}, err
+		return models.DiskStats{}, err
 	}
 
 	return res, nil
 }
 
 // parseDiskLoadForDarwin parses the disk load for Darwin OS and fills the provided result struct
-func (p *parser) parseDiskLoadForDarwin(ctx context.Context, res *DiskStats) error {
+func (p *parser) parseDiskLoadForDarwin(ctx context.Context, res *models.DiskStats) error {
 	cmdRes, err := p.execer.Exec(darwinCmdDiskLoad, darwinArgsDiskLoad...)
 	if err != nil {
 		return err
@@ -65,7 +67,7 @@ func (p *parser) parseDiskLoadForDarwin(ctx context.Context, res *DiskStats) err
 }
 
 // parseDiskSpaceForDarwin parses the disk space for Darwin OS and fills the provided result struct
-func (p *parser) parseDiskSpaceForDarwin(ctx context.Context, res *DiskStats) error {
+func (p *parser) parseDiskSpaceForDarwin(_ context.Context, res *models.DiskStats) error {
 	var err error
 	cmdRes, err := p.execer.Exec(darwinCmdDiskSpace, darwinArgsDiskSpace...)
 	if err != nil {
@@ -98,7 +100,7 @@ func (p *parser) parseDiskSpaceForDarwin(ctx context.Context, res *DiskStats) er
 }
 
 // parseDiskSpaseAsInodesForDarwin parses the disk space as inodes for Darwin OS and fills the provided result struct
-func (p *parser) parseDiskSpaseAsInodesForDarwin(ctx context.Context, res *DiskStats) error {
+func (p *parser) parseDiskSpaseAsInodesForDarwin(_ context.Context, res *models.DiskStats) error {
 	cmdRes, err := p.execer.Exec(darwinCmdDiskSpaceInodes, darwinArgsDiskSpaceInodes...)
 	if err != nil {
 		return err

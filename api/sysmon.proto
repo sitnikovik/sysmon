@@ -11,10 +11,17 @@ service SystemStats {
 message StatsRequest {}
 
 message StatsResponse {
-    CPUStats cpu = 1;
+    // Represents the CPU statistics
+    CPU cpu = 1;
+    // Represents the disk statistics
+    Disk disk = 2;
+    // Represents the memory statistics
+    Memory memory = 3;
+    // Represents the system load average
+    LoadAverage loadAverage = 4;
 
     // Represents the CPU statistics
-    message CPUStats {
+    message CPU {
         // Percentage of CPU time spent in user space
         double user = 1;
         // Percentage of CPU time spent in kernel space
@@ -32,13 +39,13 @@ message StatsResponse {
         // Number of kilobytes read+write per second
         double readWriteKB = 3;
         // Total disk space in MB
-        double totalMB = 4;
+        uint64 totalMB = 4;
         // Used disk space in MB
-        double usedMB = 5;
+        uint64 usedMB = 5;
         // Used disk space in percentage
         double usedPercent = 6;
         // Number of used inodes
-        double usedInodes = 7;
+        uint64 usedInodes = 7;
         // Used inodes in percentage
         double usedInodesPercent = 8;
     }

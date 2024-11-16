@@ -77,14 +77,16 @@ func (m *metricsStringBuilder) Print() {
 }
 
 // run parses the metrics collection in real-time mode.
-func run(ctx context.Context, interval time.Duration, duration time.Duration) {
+func run(ctx context.Context, cfg *config) {
+	n := time.Duration(cfg.Interval) * time.Second
+	m := time.Duration(cfg.Margin) * time.Second
+
 	// Start the spinner and wait for the duration
 	spinnerCh := make(chan bool)
-	go spinner(duration, spinnerCh)
-	time.Sleep(duration)
+	go spinner(m, spinnerCh)
+	time.Sleep(m)
 	spinnerCh <- true // Stop the spinner
 	var wg sync.WaitGroup
-	ticker := time.NewTicker(interval)
 
 	// Create a new storage instance to store the metrics
 	storage := storage.NewStorage()
@@ -92,6 +94,8 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 	// Clear the cli screen before printing the metrics
 	clearScreen()
 
+	var err error
+	ticker := time.NewTicker(n)
 	for range ticker.C {
 		wg.Add(1)
 		go func() {
@@ -99,35 +103,32 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 			// Builder for storing the metrics output to be printed
 			res := NewMetricsStringBuilder()
 
+			// Collectig the metrics
 			execer := cmd.NewExecer()
+			stats := models.Metrics{}
 
-			cpuStats, err := cpu.NewParser(execer).Parse(ctx)
-			res.append("CPU Usage", cpuStats.String(), err)
+			if !cfg.HasExcludedMetric(metrics.CPU) {
+				stats.CPUStats, err = cpu.NewParser(execer).Parse(ctx)
+				res.append("CPU Usage", stats.CPUStats.String(), err)
+			}
 
-			loadAverageStats, err := loadavg.NewParser(execer).Parse(ctx)
-			res.append("Load Average", loadAverageStats.String(), err)
+			if !cfg.HasExcludedMetric(metrics.LoadAverage) {
+				stats.LoadAverageStats, err = loadavg.NewParser(execer).Parse(ctx)
+				res.append("Load Average", stats.LoadAverageStats.String(), err)
+			}
 
-			memoryStats, err := memory.NewParser(execer).Parse(ctx)
-			res.append("Memory", memoryStats.String(), err)
+			if !cfg.HasExcludedMetric(metrics.Memory) {
+				stats.MemoryStats, err = memory.NewParser(execer).Parse(ctx)
+				res.append("Memory", stats.MemoryStats.String(), err)
+			}
 
-			diskStats, err := disk.NewParser(execer).Parse(ctx)
-			res.append("Disk Usage", diskStats.String(), err)
+			if !cfg.HasExcludedMetric(metrics.Disk) {
+				diskStats, err := disk.NewParser(execer).Parse(ctx)
+				res.append("Disk Usage", diskStats.String(), err)
+			}
 
-			// netStats, err := net.Parse()
-			// res.append("Network", netStats.String(), err)
-
-			// Get the traffic statistics
-
-			// connStat, err := connections.Parse()
-			// res.append("Connections", connStat.String(), err)
-
-			err = storage.Set(ctx, models.Metrics{
-				CPUStats:         cpuStats,
-				DiskStats:        diskStats,
-				MemoryStats:      memoryStats,
-				LoadAverageStats: loadAverageStats,
-			})
-			if err != nil {
+			// Store the metrics
+			if err = storage.Set(ctx, stats); err != nil {
 				log.Fatalf("%s: failed to store the metrics: %s\n", utils.BgRedText("ERROR"), err)
 			}
 

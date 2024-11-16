@@ -1,0 +1,7 @@
+interval: 1
+margin: 2
+grpc-port: 50051
+
+exclude:
+  metrics:
+    - cpu

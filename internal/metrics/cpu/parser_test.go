@@ -40,17 +40,19 @@ func Test_parser_Parse(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    models.CpuStats
+		want    models.CPUStats
 		wantErr bool
 	}{
 		{
 			name: "ok darwin",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
-						Exec(cmdByOS[os.Darwin], strings.ToInterfaces(argsByOS[os.Darwin])...).
+						Exec(cmdDarwin, strings.ToInterfaces(argsDarwin)...).
 						Return(&cmd.Result{
 							Bytes: []byte("CPU usage: 10.0% user, 20.0% sys, 70.0% idle"),
 						}, nil)
@@ -65,7 +67,7 @@ func Test_parser_Parse(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: models.CpuStats{
+			want: models.CPUStats{
 				User:   10.0,
 				System: 20.0,
 				Idle:   70.0,
@@ -75,10 +77,12 @@ func Test_parser_Parse(t *testing.T) {
 			name: "err darwin invalid cmd",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
-						Exec(cmdByOS[os.Darwin], strings.ToInterfaces(argsByOS[os.Darwin])...).
+						Exec(cmdDarwin, strings.ToInterfaces(argsDarwin)...).
 						Return(nil, errors.New("invalid cmd"))
 
 					execer.EXPECT().
@@ -94,6 +98,8 @@ func Test_parser_Parse(t *testing.T) {
 			name: "err unsupported os",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().

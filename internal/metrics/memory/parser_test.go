@@ -30,6 +30,8 @@ func Test_parser_Parse(t *testing.T) {
 			name: "ok darwin",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
@@ -71,12 +73,12 @@ func Test_parser_Parse(t *testing.T) {
 				ctx: context.Background(),
 			},
 			want: models.MemoryStats{
-				TotalMB:     26842,
-				AvailableMB: 12277,
-				FreeMB:      151,
-				ActiveMB:    12140,
-				InactiveMB:  12126,
-				WiredMB:     2421,
+				TotalMb:     26842,
+				AvailableMb: 12277,
+				FreeMb:      151,
+				ActiveMb:    12140,
+				InactiveMb:  12126,
+				WiredMb:     2421,
 			},
 		},
 	}

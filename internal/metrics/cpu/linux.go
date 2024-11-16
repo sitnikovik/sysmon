@@ -8,15 +8,14 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-// parseForLinux parses the CPU statistics of the system for Linux
-func (p *parser) parseForLinux(ctx context.Context) (models.CpuStats, error) {
-	// Using -b -n 1 for batch mode and a single snapshot
-	cmdRes, err := p.execer.Exec("top", "-b", "-n", "1")
+// parseForLinux parses the CPU statistics of the system for Linux.
+func (p *parser) parseForLinux(_ context.Context) (models.CPUStats, error) {
+	cmdRes, err := p.execer.Exec(cmdLinux, argsLinux...)
 	if err != nil {
-		return models.CpuStats{}, err
+		return models.CPUStats{}, err
 	}
 
-	res := models.CpuStats{}
+	res := models.CPUStats{}
 	for _, line := range cmdRes.Lines() {
 		if strings.HasPrefix(line, "%Cpu(s):") {
 			parts := strings.Fields(line)

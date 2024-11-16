@@ -9,9 +9,9 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-// parseForWindows parses the memory statistics for Windows OS
+// parseForWindows parses the memory statistics for Windows OS.
 func (p *parser) parseForWindows(_ context.Context) (models.MemoryStats, error) {
-	lines, err := utils.RunCmdToStrings("wmic", "os", "get", "FreePhysicalMemory,TotalVisibleMemorySize")
+	lines, err := utils.RunCmdToStrings(cmdWindows, cmdWindowsArgs...)
 	if err != nil {
 		return models.MemoryStats{}, err
 	}
@@ -25,7 +25,7 @@ func (p *parser) parseForWindows(_ context.Context) (models.MemoryStats, error) 
 	}
 
 	return models.MemoryStats{
-		FreeMB:   free / 1024,
-		ActiveMB: (total - free) / 1024,
+		FreeMb:   free / 1024,
+		ActiveMb: (total - free) / 1024,
 	}, nil
 }

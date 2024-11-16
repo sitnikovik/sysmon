@@ -8,7 +8,7 @@ import (
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
-	"github.com/sitnikovik/sysmon/internal/metrics/utils/strings"
+	stringsUtils "github.com/sitnikovik/sysmon/internal/metrics/utils/strings"
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
@@ -32,10 +32,12 @@ func Test_parser_Parse(t *testing.T) {
 			name: "ok darwin",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
-						Exec(darwinCmdDiskLoad, strings.ToInterfaces(darwinArgsDiskLoad)...).
+						Exec(darwinCmdDiskLoad, stringsUtils.ToInterfaces(darwinArgsDiskLoad)...).
 						Return(&cmd.Result{
 							Bytes: []byte(
 								"          disk0           disk1\n" +
@@ -45,7 +47,7 @@ func Test_parser_Parse(t *testing.T) {
 						}, nil).Once()
 
 					execer.EXPECT().
-						Exec(darwinCmdDiskSpaceInodes, strings.ToInterfaces(darwinArgsDiskSpaceInodes)...).
+						Exec(darwinCmdDiskSpaceInodes, stringsUtils.ToInterfaces(darwinArgsDiskSpaceInodes)...).
 						Return(&cmd.Result{
 							Bytes: []byte(
 								"Filesystem      Inodes   IUsed   IFree IUse% Mounted on\n" +
@@ -55,7 +57,7 @@ func Test_parser_Parse(t *testing.T) {
 						}, nil).Once()
 
 					execer.EXPECT().
-						Exec(darwinCmdDiskSpace, strings.ToInterfaces(darwinArgsDiskSpace)...).
+						Exec(darwinCmdDiskSpace, stringsUtils.ToInterfaces(darwinArgsDiskSpace)...).
 						Return(&cmd.Result{
 							Bytes: []byte(
 								"Filesystem      Size  Used Avail Use% Mounted on\n" +
@@ -77,9 +79,9 @@ func Test_parser_Parse(t *testing.T) {
 			want: models.DiskStats{
 				Reads:             10,
 				Writes:            20,
-				ReadWriteKB:       10*32 + 20*64,
-				TotalMB:           50 * 1024,
-				UsedMB:            20 * 1024,
+				ReadWriteKb:       10*32 + 20*64,
+				TotalMb:           50 * 1024,
+				UsedMb:            20 * 1024,
 				UsedPercent:       40,
 				UsedInodes:        1048576,
 				UsedInodesPercent: 32,

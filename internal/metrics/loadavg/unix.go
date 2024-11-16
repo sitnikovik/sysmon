@@ -9,6 +9,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
+// paserForUnix parses the load average of the system for Unix.
 func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error) {
 	cmdRes, err := p.execer.Exec(cmdUnix)
 	if err != nil {

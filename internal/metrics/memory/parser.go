@@ -11,32 +11,35 @@ import (
 )
 
 var (
-	// cmdDarwin is the command to get memory statistics on Darwin
-	cmdDarwin string = "vm_stat"
-	// cmdLinux is the command to get memory statistics on Linux
-	cmdLinux string = "free"
-	// cmdWindows is the command to get memory statistics on Windows
-	cmdWindows string = "wmic"
+	// cmdDarwin is the command to get memory statistics on Darwin.
+	cmdDarwin = "vm_stat"
 
-	// cmdLinuxArgs are the arguments for the command to get memory statistics on Linux
-	cmdLinuxArgs []string = []string{"-m"}
-	// cmdWindowsArgs are the arguments for the command to get memory statistics on Windows
-	cmdWindowsArgs []string = []string{"os", "get", "FreePhysicalMemory,TotalVisibleMemorySize"}
+	// cmdLinux is the command to get memory statistics on Linux.
+	cmdLinux = "free"
+	// cmdLinuxArgs are the arguments for the command to get memory statistics on Linux.
+	cmdLinuxArgs = []string{"-m"}
+
+	// cmdWindows is the command to get memory statistics on Windows.
+	cmdWindows = "wmic"
+	// cmdWindowsArgs are the arguments for the command to get memory statistics on Windows.
+	cmdWindowsArgs = []string{"os", "get", "FreePhysicalMemory,TotalVisibleMemorySize"}
 )
 
-// parser is an implementation of Parser
+// parser is an implementation of Parser.
 type parser struct {
 	execer cmd.Execer
 }
 
-// NewParser returns a new instance of Parser
+// NewParser returns a new instance of Parser.
+//
+//nolint:revive
 func NewParser(execer cmd.Execer) *parser {
 	return &parser{
 		execer: execer,
 	}
 }
 
-// Parse parses the memory statistics of the system
+// Parse parses the memory statistics of the system.
 func (p *parser) Parse(ctx context.Context) (models.MemoryStats, error) {
 	switch p.execer.OS() {
 	case os.Darwin:
@@ -50,7 +53,7 @@ func (p *parser) Parse(ctx context.Context) (models.MemoryStats, error) {
 	return models.MemoryStats{}, fmt.Errorf("unsupported platform %s", runtime.GOOS)
 }
 
-// pagesToMB converts the number of pages to MB
+// pagesToMB converts the number of pages to MB.
 func pagesToMB(pages, pageSizeB uint64) uint64 {
 	return pages * pageSizeB / 1024 / 1024
 }

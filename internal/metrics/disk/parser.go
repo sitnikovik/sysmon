@@ -12,43 +12,45 @@ import (
 )
 
 var (
-	darwinCmdDiskLoad         = "iostat"
-	darwinArgsDiskLoad        = []string{"-d", "-c", "1"}
-	darwinCmdDiskSpace        = "df"
-	darwinArgsDiskSpace       = []string{"-H"}
-	darwinCmdDiskSpaceInodes  = "df"
+	// darwinCmdDiskLoad is the command to get the disk load statistics on Darwin systems.
+	darwinCmdDiskLoad = "iostat"
+	// darwinArgsDiskLoad are the arguments to get the disk load statistics on Darwin systems.
+	darwinArgsDiskLoad = []string{"-d", "-c", "1"}
+	// darwinCmdDiskSpace is the command to get the disk space statistics on Darwin systems.
+	darwinCmdDiskSpace = "df"
+	// darwinArgsDiskSpace are the arguments to get the disk space statistics on Darwin systems.
+	darwinArgsDiskSpace = []string{"-H"}
+	// darwinCmdDiskSpaceInodes is the command to get the disk space inodes statistics on Darwin systems.
+	darwinCmdDiskSpaceInodes = "df"
+	// darwinArgsDiskSpaceInodes are the arguments to get the disk space inodes statistics on Darwin systems.
 	darwinArgsDiskSpaceInodes = []string{"-i"}
 )
 
-// Parser defines the interface for parsing disku usage statistics
-type Parser interface {
-	// Parse parses the disk statistics of the system
-	Parse(ctx context.Context) (models.DiskStats, error)
-}
-
-// parser - struct to hold the parser dependencies
+// parser - struct to hold the parser dependencies.
 type parser struct {
 	execer cmd.Execer
 }
 
-// NewParser returns a new instance of Parser
-func NewParser(execer cmd.Execer) Parser {
+// NewParser returns a new parser to parse disk statistics.
+//
+//nolint:revive
+func NewParser(execer cmd.Execer) *parser {
 	return &parser{
 		execer: execer,
 	}
 }
 
-// Parse parses the disk statistics of the system
+// Parse parses the disk statistics of the system.
 func (p *parser) Parse(ctx context.Context) (models.DiskStats, error) {
 	switch p.execer.OS() {
 	case os.Darwin:
 		return p.parseForDarwin(ctx)
+	default:
+		return models.DiskStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
 	}
-
-	return models.DiskStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
 }
 
-// filesystemStringFromDfOutput parses the disk system by the provided df command output
+// filesystemStringFromDfOutput parses the disk system by the provided df command output.
 func (p *parser) filesystemStringFromDfOutput(fsname string, lines []string) (string, error) {
 	for _, line := range lines {
 		if strings.Contains(line, fsname) {

@@ -8,7 +8,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-// parseForLinux parses the memory statistics for Linux OS
+// parseForLinux parses the memory statistics for Linux OS.
 func (p *parser) parseForLinux(_ context.Context) (models.MemoryStats, error) {
 	cmdRes, err := p.execer.Exec(cmdLinux, cmdLinuxArgs...)
 	if err != nil {
@@ -20,7 +20,7 @@ func (p *parser) parseForLinux(_ context.Context) (models.MemoryStats, error) {
 	for _, line := range lines {
 		if strings.HasPrefix(line, "Mem:") {
 			// TODO: Implement others memory stats like Active, Inactive, Wired
-			fmt.Sscanf(line, "Mem: %d %d %d", &res.TotalMB, &res.ActiveMB, &res.FreeMB)
+			fmt.Sscanf(line, "Mem: %d %d %d", &res.TotalMb, &res.ActiveMb, &res.FreeMb)
 			break
 		}
 	}

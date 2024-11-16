@@ -31,6 +31,8 @@ func Test_parser_Parse(t *testing.T) {
 			name: "ok darwin",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
@@ -60,6 +62,8 @@ func Test_parser_Parse(t *testing.T) {
 			name: "ok linux",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().

@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	// interval is the interval of time to output the metrics
+	// interval is the interval of time to output the metrics.
 	interval int
-	// margin is the margin of time between statistics output
+	// margin is the margin of time between statistics output.
 	margin int
-	// grpcPort is the gRPC port to connect to
+	// grpcPort is the gRPC port to connect to.
 	grpcPort int
 )
 

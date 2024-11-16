@@ -19,11 +19,14 @@ import (
 	storage "github.com/sitnikovik/sysmon/internal/storage/metrics"
 )
 
-// metricsStringBuilder is a helper struct for building the metrics output
+// metricsStringBuilder is a helper struct for building the metrics output.
 type metricsStringBuilder struct {
 	sb strings.Builder
 }
 
+// NewMetricsStringBuilder returns a new instance of metricsStringBuilder.
+//
+//nolint:revive
 func NewMetricsStringBuilder() *metricsStringBuilder {
 	m := &metricsStringBuilder{}
 	m.sb.WriteString(fmt.Sprintf("OS: %s\n", runtime.GOOS))
@@ -40,7 +43,7 @@ func NewMetricsStringBuilder() *metricsStringBuilder {
 }
 
 // append appends the metric name and the string representation of the metric
-// or print the error if the metric parsing failed
+// or print the error if the metric parsing failed.
 func (m *metricsStringBuilder) append(metricName, s string, err error) {
 	if err != nil {
 		log.Fatalf("%s: failed to parse %s: %s\n", utils.BgRedText("ERROR"), metricName, err)
@@ -52,12 +55,12 @@ func (m *metricsStringBuilder) append(metricName, s string, err error) {
 	m.sb.WriteString(fmt.Sprintf("%s\n\n", s))
 }
 
-// String returns the string representation of the metrics
+// String returns the string representation of the metrics.
 func (m *metricsStringBuilder) String() string {
 	return m.sb.String()
 }
 
-// Print prints the metrics output
+// Print prints the metrics output.
 func (m *metricsStringBuilder) Print() {
 	n := strings.Count(m.String(), "\n") + 1
 	clearLines(n)
@@ -65,7 +68,7 @@ func (m *metricsStringBuilder) Print() {
 	fmt.Print("\r" + m.String())
 }
 
-// run parses the metrics collection in real-time mode
+// run parses the metrics collection in real-time mode.
 func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 	// Start the spinner and wait for the duration
 	spinnerCh := make(chan bool)
@@ -111,7 +114,7 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 			// res.append("Connections", connStat.String(), err)
 
 			err = storage.Set(ctx, models.Metrics{
-				CpuStats:         cpuStats,
+				CPUStats:         cpuStats,
 				DiskStats:        diskStats,
 				MemoryStats:      memoryStats,
 				LoadAverageStats: loadAverageStats,
@@ -125,7 +128,7 @@ func run(ctx context.Context, interval time.Duration, duration time.Duration) {
 	}
 }
 
-// spinner shows a spinner while waiting for the duration
+// spinner shows a spinner while waiting for the duration.
 func spinner(duration time.Duration, done chan bool) {
 	spinnerDelay := 100 * time.Millisecond
 	for {
@@ -142,12 +145,12 @@ func spinner(duration time.Duration, done chan bool) {
 	}
 }
 
-// clearScreen clears the screen
+// clearScreen clears the screen.
 func clearScreen() {
 	fmt.Print("\033[H\033[2J")
 }
 
-// clearLines clears n lines
+// clearLines clears n lines.
 func clearLines(n int) {
 	for i := 0; i < n; i++ {
 		fmt.Print("\033[A\033[K")

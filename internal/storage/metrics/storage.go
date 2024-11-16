@@ -9,18 +9,20 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-// tmpFile is the temporary file to store the metrics
+// tmpFile is the temporary file to store the metrics.
 const tmpFile = "/tmp/sysmon.json"
 
-// storage implements the Storage interface
+// storage implements the Storage interface.
 type storage struct{}
 
-// NewStorage returns a new instance of Storage
+// NewStorage returns a new instance of Storage.
+//
+//nolint:revive
 func NewStorage() *storage {
 	return &storage{}
 }
 
-// Get returns the metrics of the system
+// Get returns the metrics of the system.
 func (s *storage) Get(_ context.Context) (models.Metrics, error) {
 	str, err := os.ReadFile(tmpFile)
 	if err != nil {
@@ -36,7 +38,7 @@ func (s *storage) Get(_ context.Context) (models.Metrics, error) {
 	return m, nil
 }
 
-// Set stores the metrics of the system
+// Set stores the metrics of the system.
 func (s *storage) Set(_ context.Context, m models.Metrics) error {
 	str, err := json.Marshal(m)
 	if err != nil {

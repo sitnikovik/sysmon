@@ -11,7 +11,7 @@ import (
 	pb "github.com/sitnikovik/sysmon/pkg/v1/api"
 )
 
-// runGRPCServer runs the gRPC server
+// runGRPCServer runs the gRPC server.
 func runGRPCServer(grpcPort int) error {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {

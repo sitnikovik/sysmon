@@ -8,7 +8,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-// parseForDarwin parses the memory statistics for Darwin OS
+// parseForDarwin parses the memory statistics for Darwin OS.
 func (p *parser) parseForDarwin(_ context.Context) (models.MemoryStats, error) {
 	cmdRes, err := p.execer.Exec(cmdDarwin)
 	if err != nil {
@@ -44,11 +44,11 @@ func (p *parser) parseForDarwin(_ context.Context) (models.MemoryStats, error) {
 	}
 
 	return models.MemoryStats{
-		TotalMB:     pagesToMB(free+active+inactive+speculativel+wired+throttled, pageSizeB),
-		AvailableMB: pagesToMB(free+inactive, pageSizeB),
-		FreeMB:      pagesToMB(free, pageSizeB),
-		ActiveMB:    pagesToMB(active, pageSizeB),
-		InactiveMB:  pagesToMB(inactive, pageSizeB),
-		WiredMB:     pagesToMB(wired, pageSizeB),
+		TotalMb:     pagesToMB(free+active+inactive+speculativel+wired+throttled, pageSizeB),
+		AvailableMb: pagesToMB(free+inactive, pageSizeB),
+		FreeMb:      pagesToMB(free, pageSizeB),
+		ActiveMb:    pagesToMB(active, pageSizeB),
+		InactiveMb:  pagesToMB(inactive, pageSizeB),
+		WiredMb:     pagesToMB(wired, pageSizeB),
 	}, nil
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-// parseForDarwin parses the disk statistics for Darwin OS
+// parseForDarwin parses the disk statistics for Darwin OS.
 func (p *parser) parseForDarwin(ctx context.Context) (models.DiskStats, error) {
 	var res models.DiskStats
 	var err error
@@ -35,8 +35,8 @@ func (p *parser) parseForDarwin(ctx context.Context) (models.DiskStats, error) {
 	return res, nil
 }
 
-// parseDiskLoadForDarwin parses the disk load for Darwin OS and fills the provided result struct
-func (p *parser) parseDiskLoadForDarwin(ctx context.Context, res *models.DiskStats) error {
+// parseDiskLoadForDarwin parses the disk load for Darwin OS and fills the provided result struct.
+func (p *parser) parseDiskLoadForDarwin(_ context.Context, res *models.DiskStats) error {
 	cmdRes, err := p.execer.Exec(darwinCmdDiskLoad, darwinArgsDiskLoad...)
 	if err != nil {
 		return err
@@ -62,11 +62,11 @@ func (p *parser) parseDiskLoadForDarwin(ctx context.Context, res *models.DiskSta
 	res.Writes = tpsDisk1 // Assuming that disk1 is doing writes
 	readKBPerSec := KBtDisk0 * tpsDisk0
 	writeKBPerSec := KBtDisk1 * tpsDisk1
-	res.ReadWriteKB = readKBPerSec + writeKBPerSec
+	res.ReadWriteKb = readKBPerSec + writeKBPerSec
 	return nil
 }
 
-// parseDiskSpaceForDarwin parses the disk space for Darwin OS and fills the provided result struct
+// parseDiskSpaceForDarwin parses the disk space for Darwin OS and fills the provided result struct.
 func (p *parser) parseDiskSpaceForDarwin(_ context.Context, res *models.DiskStats) error {
 	var err error
 	cmdRes, err := p.execer.Exec(darwinCmdDiskSpace, darwinArgsDiskSpace...)
@@ -86,11 +86,11 @@ func (p *parser) parseDiskSpaceForDarwin(_ context.Context, res *models.DiskStat
 
 	// Getting the total disk space
 	total, _ := strconv.ParseUint(strings.TrimSuffix(data[1], "G"), 10, 64)
-	res.TotalMB = total * 1024
+	res.TotalMb = total * 1024
 
 	// Getting the used disk space
 	used, _ := strconv.ParseUint(strings.TrimSuffix(data[2], "G"), 10, 64)
-	res.UsedMB = used * 1024
+	res.UsedMb = used * 1024
 
 	// Getting the used disk space in percentage
 	usedPercent, _ := strconv.ParseFloat(strings.TrimSuffix(data[4], "%"), 64)
@@ -99,7 +99,7 @@ func (p *parser) parseDiskSpaceForDarwin(_ context.Context, res *models.DiskStat
 	return nil
 }
 
-// parseDiskSpaseAsInodesForDarwin parses the disk space as inodes for Darwin OS and fills the provided result struct
+// parseDiskSpaseAsInodesForDarwin parses the disk space as inodes for Darwin OS and fills the provided result struct.
 func (p *parser) parseDiskSpaseAsInodesForDarwin(_ context.Context, res *models.DiskStats) error {
 	cmdRes, err := p.execer.Exec(darwinCmdDiskSpaceInodes, darwinArgsDiskSpaceInodes...)
 	if err != nil {

@@ -38,10 +38,10 @@ message StatsResponse {
         double writes = 2;
         // Number of kilobytes read+write per second
         double readWriteKB = 3;
-        // Total disk space in MB
-        uint64 totalMB = 4;
-        // Used disk space in MB
-        uint64 usedMB = 5;
+        // Total disk space in Mb
+        uint64 totalMb = 4;
+        // Used disk space in Mb
+        uint64 usedMb = 5;
         // Used disk space in percentage
         double usedPercent = 6;
         // Number of used inodes
@@ -51,24 +51,24 @@ message StatsResponse {
     }
 
     message Memory {
-        // Total memory in MB
-        uint64 totalMB = 1;
-        // Available memory in MB shows how much memory in MB is available for new processes.
-        uint64 availableMB = 2;
-        // Free memory in MB shows how much memory in MB is available for new processes.
+        // Total memory in Mb
+        uint64 totalMb = 1;
+        // Available memory in Mb shows how much memory in Mb is available for new processes.
+        uint64 availableMb = 2;
+        // Free memory in Mb shows how much memory in Mb is available for new processes.
         // If this value is high, it means that the system has some spare memory,
         // allowing more applications to run without having to free up memory.
-        uint64 freeMB = 3;
-        // Active memory in MB hows how much memory in MB that are currently being actively used by processes.
+        uint64 freeMb = 3;
+        // Active memory in Mb hows how much memory in Mb that are currently being actively used by processes.
 	    // These pages contain data that is actively being read or written.
-        uint64 activeMB = 4;
-        // Inactive shows how much memory in MB that were previously used but are not currently active.
+        uint64 activeMb = 4;
+        // Inactive shows how much memory in Mb that were previously used but are not currently active.
 	    // These pages may contain data that is not used, but can be restored to the active state if necessary.
-        uint64 inactiveMB = 5;
-        // Wired shows how much memory in MB  that are hard-locked in RAM and cannot be paged out or released.
+        uint64 inactiveMb = 5;
+        // Wired shows how much memory in Mb  that are hard-locked in RAM and cannot be paged out or released.
         // These are usually mission-critical pages that are used by the operating system kernel or drivers,
         // and they are necessary for the system to work.
-        uint64 WiredMB = 6;
+        uint64 WiredMb = 6;
     }
 
     // Represents the system load average

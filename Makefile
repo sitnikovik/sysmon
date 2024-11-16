@@ -25,8 +25,8 @@ run:
 
 # Run the sysmon service in a docker container
 .PHONY: docker-up
-run-ubuntu:
-	docker-compose up --build ubuntu
+docker-up:
+	docker-compose up --build ubuntu2204
 
 # Build the sysmon binary for the host OS
 .PHONY: build

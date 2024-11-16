@@ -8,6 +8,8 @@ services:
     container_name: ubuntu2204
     networks:
       - sysmon_network
+    stdin_open: true
+    tty: true
 
 networks:
   sysmon_network:

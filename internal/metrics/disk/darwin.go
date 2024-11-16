@@ -2,10 +2,10 @@ package disk
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"strings"
 
+	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
@@ -44,12 +44,12 @@ func (p *parser) parseDiskLoadForDarwin(_ context.Context, res *models.DiskStats
 
 	lines := cmdRes.Lines()
 	if len(lines) < 4 {
-		return errors.New("invalid output")
+		return metrics.ErrInvalidOutput
 	}
 
 	data := strings.Fields(lines[2])
 	if len(data) < 5 {
-		return errors.New("invalid output")
+		return metrics.ErrInvalidOutput
 	}
 
 	KBtDisk0, _ := strconv.ParseFloat(data[0], 64) // KB/t для disk0
@@ -81,7 +81,7 @@ func (p *parser) parseDiskSpaceForDarwin(_ context.Context, res *models.DiskStat
 	}
 	data := strings.Fields(fsline)
 	if len(data) < 6 {
-		return errors.New("invalid output")
+		return metrics.ErrInvalidOutput
 	}
 
 	// Getting the total disk space
@@ -113,7 +113,7 @@ func (p *parser) parseDiskSpaseAsInodesForDarwin(_ context.Context, res *models.
 	}
 	data := strings.Fields(fsline)
 	if len(data) < 6 {
-		return errors.New("invalid output")
+		return metrics.ErrInvalidOutput
 	}
 
 	// Getting the used inodes

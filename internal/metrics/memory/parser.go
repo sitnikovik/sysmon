@@ -2,9 +2,8 @@ package memory
 
 import (
 	"context"
-	"fmt"
-	"runtime"
 
+	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 	"github.com/sitnikovik/sysmon/internal/models"
@@ -50,7 +49,7 @@ func (p *parser) Parse(ctx context.Context) (models.MemoryStats, error) {
 		return p.parseForWindows(ctx)
 	}
 
-	return models.MemoryStats{}, fmt.Errorf("unsupported platform %s", runtime.GOOS)
+	return models.MemoryStats{}, metrics.ErrUnsupportedOS
 }
 
 // pagesToMB converts the number of pages to MB.

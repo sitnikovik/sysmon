@@ -2,8 +2,8 @@ package cpu
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 	"github.com/sitnikovik/sysmon/internal/models"
@@ -49,6 +49,6 @@ func (p *parser) Parse(ctx context.Context) (models.CPUStats, error) {
 	case os.Windows:
 		return p.parseForWindows(ctx)
 	default:
-		return models.CPUStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
+		return models.CPUStats{}, metrics.ErrUnsupportedOS
 	}
 }

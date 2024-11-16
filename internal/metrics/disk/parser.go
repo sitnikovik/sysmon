@@ -3,9 +3,9 @@ package disk
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
+	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 	"github.com/sitnikovik/sysmon/internal/models"
@@ -46,7 +46,7 @@ func (p *parser) Parse(ctx context.Context) (models.DiskStats, error) {
 	case os.Darwin:
 		return p.parseForDarwin(ctx)
 	default:
-		return models.DiskStats{}, fmt.Errorf("unsupported platform %s", p.execer.OS())
+		return models.DiskStats{}, metrics.ErrUnsupportedOS
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
@@ -18,7 +19,7 @@ func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error
 
 	lines := cmdRes.Lines()
 	if len(lines) == 0 || len(lines) > 2 {
-		return models.LoadAverageStats{}, fmt.Errorf("invalid output length %d", len(lines))
+		return models.LoadAverageStats{}, metrics.ErrInvalidOutput
 	}
 
 	res := models.LoadAverageStats{}

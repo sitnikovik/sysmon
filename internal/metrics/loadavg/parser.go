@@ -2,8 +2,8 @@ package loadavg
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/os"
 	"github.com/sitnikovik/sysmon/internal/models"
@@ -32,5 +32,5 @@ func (p *parser) Parse(ctx context.Context) (models.LoadAverageStats, error) {
 		return p.parseForUnix(ctx)
 	}
 
-	return models.LoadAverageStats{}, fmt.Errorf("unsupported OS: %s", p.execer.OS())
+	return models.LoadAverageStats{}, metrics.ErrUnsupportedOS
 }

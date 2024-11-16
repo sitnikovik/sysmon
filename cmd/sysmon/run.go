@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"runtime"
@@ -9,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/metrics/cpu"
 	"github.com/sitnikovik/sysmon/internal/metrics/disk"
 	"github.com/sitnikovik/sysmon/internal/metrics/loadavg"
@@ -45,12 +47,18 @@ func NewMetricsStringBuilder() *metricsStringBuilder {
 // append appends the metric name and the string representation of the metric
 // or print the error if the metric parsing failed.
 func (m *metricsStringBuilder) append(metricName, s string, err error) {
-	if err != nil {
-		log.Fatalf("%s: failed to parse %s: %s\n", utils.BgRedText("ERROR"), metricName, err)
-		return
-	}
-
 	m.sb.WriteString(utils.BgGreenText(utils.BoldText(metricName + "\n")))
+
+	if err != nil {
+		switch {
+		case errors.Is(err, metrics.ErrInvalidOutput):
+			log.Fatalf("%s: failed to parse %s: %s\n", utils.BgRedText("ERROR"), metricName, err)
+			return
+		default:
+			m.sb.WriteString(fmt.Sprintf("%s: %s\n", utils.BgRedText("ERROR"), err))
+			return
+		}
+	}
 
 	m.sb.WriteString(fmt.Sprintf("%s\n\n", s))
 }

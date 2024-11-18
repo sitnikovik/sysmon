@@ -78,6 +78,17 @@ func (m *metricsStringBuilder) Print() {
 
 // run parses the metrics collection in real-time mode.
 func run(ctx context.Context, cfg *config) {
+	// Get the metrics to parse
+	metricsToParse := getMetricsToParse(cfg, []metrics.Type{
+		metrics.CPU,
+		metrics.LoadAverage,
+		metrics.Memory,
+		metrics.Disk,
+	})
+	if len(metricsToParse) == 0 {
+		log.Fatalf("%s: no metrics to parse\n", utils.BgRedText("ERROR"))
+	}
+
 	n := time.Duration(cfg.Interval) * time.Second
 	m := time.Duration(cfg.Margin) * time.Second
 
@@ -97,6 +108,10 @@ func run(ctx context.Context, cfg *config) {
 	var err error
 	ticker := time.NewTicker(n)
 	for range ticker.C {
+		if err != nil {
+			ticker.Stop()
+		}
+
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -106,25 +121,21 @@ func run(ctx context.Context, cfg *config) {
 			// Collectig the metrics
 			execer := cmd.NewExecer()
 			stats := models.Metrics{}
-
-			if !cfg.HasExcludedMetric(metrics.CPU) {
-				stats.CPUStats, err = cpu.NewParser(execer).Parse(ctx)
-				res.append("CPU Usage", stats.CPUStats.String(), err)
-			}
-
-			if !cfg.HasExcludedMetric(metrics.LoadAverage) {
-				stats.LoadAverageStats, err = loadavg.NewParser(execer).Parse(ctx)
-				res.append("Load Average", stats.LoadAverageStats.String(), err)
-			}
-
-			if !cfg.HasExcludedMetric(metrics.Memory) {
-				stats.MemoryStats, err = memory.NewParser(execer).Parse(ctx)
-				res.append("Memory", stats.MemoryStats.String(), err)
-			}
-
-			if !cfg.HasExcludedMetric(metrics.Disk) {
-				diskStats, err := disk.NewParser(execer).Parse(ctx)
-				res.append("Disk Usage", diskStats.String(), err)
+			for _, metricType := range metricsToParse {
+				switch metricType {
+				case metrics.CPU:
+					stats.CPUStats, err = cpu.NewParser(execer).Parse(ctx)
+					res.append("CPU Usage", stats.CPUStats.String(), err)
+				case metrics.LoadAverage:
+					stats.LoadAverageStats, err = loadavg.NewParser(execer).Parse(ctx)
+					res.append("Load Average", stats.LoadAverageStats.String(), err)
+				case metrics.Memory:
+					stats.MemoryStats, err = memory.NewParser(execer).Parse(ctx)
+					res.append("Memory", stats.MemoryStats.String(), err)
+				case metrics.Disk:
+					diskStats, err := disk.NewParser(execer).Parse(ctx)
+					res.append("Disk Usage", diskStats.String(), err)
+				}
 			}
 
 			// Store the metrics
@@ -164,4 +175,21 @@ func clearLines(n int) {
 	for i := 0; i < n; i++ {
 		fmt.Print("\033[A\033[K")
 	}
+}
+
+// getMetricsToParse returns the metrics to parse.
+func getMetricsToParse(cfg *config, allMetrics []metrics.Type) []metrics.Type {
+	excludedMetrics := make(map[string]struct{})
+	for _, metric := range cfg.Exclude.Metrics {
+		excludedMetrics[metric] = struct{}{}
+	}
+
+	metricsToParse := make([]metrics.Type, 0, len(allMetrics))
+	for _, metric := range allMetrics {
+		if _, excluded := excludedMetrics[metric.String()]; !excluded {
+			metricsToParse = append(metricsToParse, metric)
+		}
+	}
+
+	return metricsToParse
 }

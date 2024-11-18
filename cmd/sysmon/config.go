@@ -52,7 +52,7 @@ func (c *config) validate() error {
 	}
 
 	for _, metric := range c.Exclude.Metrics {
-		switch metric {
+		switch metrics.NameToType(metric) {
 		case metrics.CPU,
 			metrics.Disk,
 			metrics.LoadAverage,
@@ -66,13 +66,19 @@ func (c *config) validate() error {
 	return nil
 }
 
-// HasExcludedMetric checks if the metric is excluded.
-func (c *config) HasExcludedMetric(metric string) bool {
-	for _, m := range c.Exclude.Metrics {
-		if m == metric {
-			return true
+// GetMetricsToParse returns the metrics to parse.
+func (c *config) GetMetricsToParse(allMetrics []string) []string {
+	excludedMetrics := make(map[string]struct{})
+	for _, metric := range c.Exclude.Metrics {
+		excludedMetrics[metric] = struct{}{}
+	}
+
+	var metricsToParse []string
+	for _, metric := range allMetrics {
+		if _, excluded := excludedMetrics[metric]; !excluded {
+			metricsToParse = append(metricsToParse, metric)
 		}
 	}
 
-	return false
+	return metricsToParse
 }

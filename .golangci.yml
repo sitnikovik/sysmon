@@ -42,7 +42,6 @@ linters:
     - durationcheck
     - errorlint
     - exhaustive
-    - exportloopref
     - funlen
     - goimports
     - gocognit

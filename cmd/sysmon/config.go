@@ -13,7 +13,7 @@ import (
 type config struct {
 	Interval int `yaml:"interval"`
 	Margin   int `yaml:"margin"`
-	GRPCPort int `yaml:"grpc-port"`
+	GRPCPort int `yaml:"grpcPort"`
 	Exclude  struct {
 		Metrics []string `yaml:"metrics"`
 	} `yaml:"exclude"`
@@ -52,13 +52,7 @@ func (c *config) validate() error {
 	}
 
 	for _, metric := range c.Exclude.Metrics {
-		switch metrics.NameToType(metric) {
-		case metrics.CPU,
-			metrics.Disk,
-			metrics.LoadAverage,
-			metrics.Memory:
-			continue
-		default:
+		if metrics.NameToType(metric) == metrics.Undefined {
 			return fmt.Errorf("invalid metric name: %s", metric)
 		}
 	}

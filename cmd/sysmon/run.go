@@ -119,6 +119,8 @@ func run(ctx context.Context, cfg *config) {
 			stats := models.Metrics{}
 			for _, metricType := range metricsToParse {
 				switch metricType {
+				case metrics.Undefined:
+					log.Fatalf("%s: undefined metric type\n", utils.BgRedText("ERROR"))
 				case metrics.CPU:
 					stats.CPUStats, err = cpu.NewParser(execer).Parse(ctx)
 					res.append("CPU Usage", stats.CPUStats.String(), err)

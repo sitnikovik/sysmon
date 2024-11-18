@@ -17,7 +17,7 @@ const (
 )
 
 // metricTypeToName is a map to convert the metric type to the name.
-var metricTypeToName map[Type]string = map[Type]string{
+var metricTypeToName = map[Type]string{
 	CPU:         "cpu",
 	Disk:        "disk",
 	LoadAverage: "loadavg",

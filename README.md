@@ -54,8 +54,7 @@ bin/sysmon
 
 ### Example
 
-[![Output example](output_example.png)]
-
+![Output example](output_example.png)
 
 ## API
 

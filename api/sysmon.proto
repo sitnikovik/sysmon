@@ -37,7 +37,7 @@ message StatsResponse {
         // Number of writes per second
         double writes = 2;
         // Number of kilobytes read+write per second
-        double readWriteKB = 3;
+        double readWriteKb = 3;
         // Total disk space in Mb
         uint64 totalMb = 4;
         // Used disk space in Mb

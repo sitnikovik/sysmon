@@ -25,11 +25,16 @@ func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error
 	res := models.LoadAverageStats{}
 	parts := strings.Split(lines[0], "load averages:")
 	if len(parts) < 2 {
-		return models.LoadAverageStats{}, errors.New("failed to find load averages in output")
+		parts = strings.Split(lines[0], "load average:") // Ubuntu case
+		if len(parts) < 2 {
+			return models.LoadAverageStats{}, errors.New("failed to find load averages in output")
+		}
 	}
-	_, err = fmt.Sscanf(parts[1], "%f %f %f", &res.OneMin, &res.FiveMin, &res.FifteenMin)
+
+	s := strings.Trim(parts[1], " ")
+	_, err = fmt.Sscanf(s, "%f %f %f", &res.OneMin, &res.FiveMin, &res.FifteenMin)
 	if err != nil {
-		return models.LoadAverageStats{}, fmt.Errorf("error parsing load averages: %w", err)
+		return models.LoadAverageStats{}, fmt.Errorf("parsing failed: %w", err)
 	}
 
 	return res, err

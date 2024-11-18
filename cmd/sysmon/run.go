@@ -108,10 +108,6 @@ func run(ctx context.Context, cfg *config) {
 	var err error
 	ticker := time.NewTicker(n)
 	for range ticker.C {
-		if err != nil {
-			ticker.Stop()
-		}
-
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -133,8 +129,8 @@ func run(ctx context.Context, cfg *config) {
 					stats.MemoryStats, err = memory.NewParser(execer).Parse(ctx)
 					res.append("Memory", stats.MemoryStats.String(), err)
 				case metrics.Disk:
-					diskStats, err := disk.NewParser(execer).Parse(ctx)
-					res.append("Disk Usage", diskStats.String(), err)
+					stats.DiskStats, err = disk.NewParser(execer).Parse(ctx)
+					res.append("Disk Usage", stats.DiskStats.String(), err)
 				}
 			}
 

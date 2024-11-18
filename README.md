@@ -52,6 +52,11 @@ bin/sysmon -n=5 -m=15 -grpc-port=50051
 bin/sysmon
 ```
 
+### Example
+
+[![Output example](output_example.png)]
+
+
 ## API
 
 There is a gRPC API to get the app results stored in `tmp/`
@@ -65,32 +70,32 @@ Returns the system monitoring statistics resulted with the app.
 ```json
 {
     "cpu": {
-        "user": 8.12,
-        "system": 11.5,
-        "idle": 80.82
+        "user": 7.48,
+        "system": 11.2,
+        "idle": 81.49
     },
     "disk": {
-        "reads": 0,
+        "reads": 34,
         "writes": 0,
-        "readWriteKB": 0,
-        "totalMb": "0",
-        "usedMb": "0",
-        "usedPercent": 0,
-        "usedInodes": "0",
-        "usedInodesPercent": 0
+        "readWriteKb": 349.85999999999996,
+        "totalMb": "1018880",
+        "usedMb": "745472",
+        "usedPercent": 76,
+        "usedInodes": "1422283552",
+        "usedInodesPercent": 76
     },
     "memory": {
-        "totalMb": "21181",
-        "availableMb": "9390",
-        "freeMb": "202",
-        "activeMb": "9233",
-        "inactiveMb": "9187",
-        "WiredMb": "2551"
+        "totalMb": "19626",
+        "availableMb": "8427",
+        "freeMb": "154",
+        "activeMb": "8330",
+        "inactiveMb": "8272",
+        "WiredMb": "2817"
     },
     "loadAverage": {
-        "oneMin": 2.32,
-        "fiveMin": 2.47,
-        "fifteenMin": 2.68
+        "oneMin": 2.46,
+        "fiveMin": 2.97,
+        "fifteenMin": 3.13
     }
 }
 ```

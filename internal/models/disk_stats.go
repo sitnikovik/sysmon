@@ -15,9 +15,9 @@ type DiskStats struct {
 	Reads float64 `json:"reads"`
 	// Writes show the number of writes per second.
 	Writes float64 `json:"writes"`
-	// ReadWriteKB show the number of kilobytes read+write per second.
+	// ReadWriteKb show the number of kilobytes read+write per second.
 	ReadWriteKb float64 `json:"readWriteKb"`
-	// TotalMB shows the total disk space in MB.
+	// TotalMb shows the total disk space in MB.
 	TotalMb uint64 `json:"totalMb"`
 	// UsedMb shows the used disk space in MB
 	UsedMb uint64 `json:"usedMb"`

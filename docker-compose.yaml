@@ -1,11 +1,11 @@
 version: "3.8"
 
 services:
-  ubuntu2204:
+  ubuntu1804:
     build:
       context: .
-      dockerfile: docker/Dockerfile.ubuntu2204
-    container_name: ubuntu2204
+      dockerfile: docker/Dockerfile.ubuntu1804
+    container_name: ubuntu1804
     networks:
       - sysmon_network
     stdin_open: true

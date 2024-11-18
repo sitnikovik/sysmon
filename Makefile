@@ -2,7 +2,7 @@ LOCAL_BIN:=$(CURDIR)/bin
 
 # Install golang dependencies for the project
 .PHONY: install-go-deps
-install-go-deps:
+install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 
@@ -26,7 +26,7 @@ run:
 # Run the sysmon service in a docker container
 .PHONY: docker-up
 docker-up:
-	docker-compose up --build ubuntu2204
+	docker-compose up --build ubuntu1804
 
 # Build the sysmon binary for the host OS
 .PHONY: build

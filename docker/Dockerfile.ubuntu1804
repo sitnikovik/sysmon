@@ -16,13 +16,9 @@ RUN curl -OL https://golang.org/dl/go1.22.5.linux-amd64.tar.gz && \
 
 # Set Go environment variables
 ENV PATH="/usr/local/go/bin:${PATH}"
-ENV GOPROXY=https://proxy.golang.org,direct
 
 COPY . /app
 WORKDIR /app
-
-# Install dependencies
-RUN go mod download
 
 # Build the Go application
 RUN go build -o bin/sysmon ./cmd/sysmon/

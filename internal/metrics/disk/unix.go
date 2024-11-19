@@ -9,25 +9,25 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
-// parseForDarwin parses the disk statistics for Darwin OS.
-func (p *parser) parseForDarwin(ctx context.Context) (models.DiskStats, error) {
+// parseForUnix parses the disk statistics for Unix OS.
+func (p *parser) parseForUnix(ctx context.Context) (models.DiskStats, error) {
 	var res models.DiskStats
 	var err error
 
 	// Getting the disk load
-	err = p.parseDiskLoadForDarwin(ctx, &res)
+	err = p.parseDiskLoadForUnix(ctx, &res)
 	if err != nil {
 		return models.DiskStats{}, err
 	}
 
 	// Getting the disk space
-	err = p.parseDiskSpaceForDarwin(ctx, &res)
+	err = p.parseDiskSpaceForUnix(ctx, &res)
 	if err != nil {
 		return models.DiskStats{}, err
 	}
 
-	// Getting the disk space as inodes
-	err = p.parseDiskSpaseAsInodesForDarwin(ctx, &res)
+	// // Getting the disk space as inodes
+	err = p.parseDiskSpaseAsInodesForUnix(ctx, &res)
 	if err != nil {
 		return models.DiskStats{}, err
 	}
@@ -35,9 +35,9 @@ func (p *parser) parseForDarwin(ctx context.Context) (models.DiskStats, error) {
 	return res, nil
 }
 
-// parseDiskLoadForDarwin parses the disk load for Darwin OS and fills the provided result struct.
-func (p *parser) parseDiskLoadForDarwin(_ context.Context, res *models.DiskStats) error {
-	cmdRes, err := p.execer.Exec(darwinCmdDiskLoad, darwinArgsDiskLoad...)
+// parseDiskLoadForUnix parses the disk load for Unix OS and fills the provided result struct.
+func (p *parser) parseDiskLoadForUnix(_ context.Context, res *models.DiskStats) error {
+	cmdRes, err := p.execer.Exec(unixCmdDiskLoad, unixArgsDiskLoad...)
 	if err != nil {
 		return err
 	}
@@ -48,28 +48,36 @@ func (p *parser) parseDiskLoadForDarwin(_ context.Context, res *models.DiskStats
 	}
 
 	data := strings.Fields(lines[2])
-	if len(data) < 5 {
+	if len(data) < 2 {
 		return metrics.ErrInvalidOutput
 	}
 
 	KBtDisk0, _ := strconv.ParseFloat(data[0], 64) // KB/t для disk0
 	tpsDisk0, _ := strconv.ParseFloat(data[1], 64) // tps для disk0
-	KBtDisk1, _ := strconv.ParseFloat(data[3], 64) // KB/t для disk1
-	tpsDisk1, _ := strconv.ParseFloat(data[4], 64) // tps для disk1
 
-	// Filling the result struct
+	// Filling the result struct for disk0
 	res.Reads = tpsDisk0
-	res.Writes = tpsDisk1 // Assuming that disk1 is doing writes
 	readKBPerSec := KBtDisk0 * tpsDisk0
-	writeKBPerSec := KBtDisk1 * tpsDisk1
-	res.ReadWriteKb = readKBPerSec + writeKBPerSec
+	res.ReadWriteKb = readKBPerSec
+
+	// Check if data for disk1 is available
+	if len(data) >= 5 {
+		KBtDisk1, _ := strconv.ParseFloat(data[3], 64) // KB/t для disk1
+		tpsDisk1, _ := strconv.ParseFloat(data[4], 64) // tps для disk1
+
+		// Assuming that disk1 is doing writes
+		res.Writes = tpsDisk1
+		writeKBPerSec := KBtDisk1 * tpsDisk1
+		res.ReadWriteKb += writeKBPerSec
+	}
+
 	return nil
 }
 
-// parseDiskSpaceForDarwin parses the disk space for Darwin OS and fills the provided result struct.
-func (p *parser) parseDiskSpaceForDarwin(_ context.Context, res *models.DiskStats) error {
+// parseDiskSpaceForUnix parses the disk space for Unix OS and fills the provided result struct.
+func (p *parser) parseDiskSpaceForUnix(_ context.Context, res *models.DiskStats) error {
 	var err error
-	cmdRes, err := p.execer.Exec(darwinCmdDiskSpace, darwinArgsDiskSpace...)
+	cmdRes, err := p.execer.Exec(unixCmdDiskSpace, unixArgsDiskSpace...)
 	if err != nil {
 		return err
 	}
@@ -99,9 +107,9 @@ func (p *parser) parseDiskSpaceForDarwin(_ context.Context, res *models.DiskStat
 	return nil
 }
 
-// parseDiskSpaseAsInodesForDarwin parses the disk space as inodes for Darwin OS and fills the provided result struct.
-func (p *parser) parseDiskSpaseAsInodesForDarwin(_ context.Context, res *models.DiskStats) error {
-	cmdRes, err := p.execer.Exec(darwinCmdDiskSpaceInodes, darwinArgsDiskSpaceInodes...)
+// parseDiskSpaseAsInodesForUnix parses the disk space as inodes for unix OS and fills the provided result struct.
+func (p *parser) parseDiskSpaseAsInodesForUnix(_ context.Context, res *models.DiskStats) error {
+	cmdRes, err := p.execer.Exec(unixCmdDiskSpaceInodes, unixArgsDiskSpaceInodes...)
 	if err != nil {
 		return err
 	}

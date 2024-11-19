@@ -9,6 +9,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
+// cmdUnix is the command to get the load average on Unix systems.
 var cmdUnix = "uptime"
 
 // parser is an implementation of Parser.
@@ -27,8 +28,7 @@ func NewParser(execer cmd.Execer) *parser {
 
 // Parse parses the load average of the system.
 func (p *parser) Parse(ctx context.Context) (models.LoadAverageStats, error) {
-	switch p.execer.OS() {
-	case os.Darwin, os.Linux:
+	if p.execer.OS() == os.Darwin || p.execer.OS() == os.Linux {
 		return p.parseForUnix(ctx)
 	}
 

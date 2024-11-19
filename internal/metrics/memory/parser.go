@@ -45,8 +45,6 @@ func (p *parser) Parse(ctx context.Context) (models.MemoryStats, error) {
 		return p.parseForDarwin(ctx)
 	case os.Linux:
 		return p.parseForLinux(ctx)
-	case os.Windows:
-		return p.parseForWindows(ctx)
 	}
 
 	return models.MemoryStats{}, metrics.ErrUnsupportedOS

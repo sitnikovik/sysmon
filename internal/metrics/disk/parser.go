@@ -12,18 +12,18 @@ import (
 )
 
 var (
-	// darwinCmdDiskLoad is the command to get the disk load statistics on Darwin systems.
-	darwinCmdDiskLoad = "iostat"
-	// darwinArgsDiskLoad are the arguments to get the disk load statistics on Darwin systems.
-	darwinArgsDiskLoad = []string{"-d", "-c", "1"}
-	// darwinCmdDiskSpace is the command to get the disk space statistics on Darwin systems.
-	darwinCmdDiskSpace = "df"
-	// darwinArgsDiskSpace are the arguments to get the disk space statistics on Darwin systems.
-	darwinArgsDiskSpace = []string{"-H"}
-	// darwinCmdDiskSpaceInodes is the command to get the disk space inodes statistics on Darwin systems.
-	darwinCmdDiskSpaceInodes = "df"
-	// darwinArgsDiskSpaceInodes are the arguments to get the disk space inodes statistics on Darwin systems.
-	darwinArgsDiskSpaceInodes = []string{"-i"}
+	// unixCmdDiskLoad is the command to get the disk load statistics on unix systems.
+	unixCmdDiskLoad = "iostat"
+	// unixArgsDiskLoad are the arguments to get the disk load statistics on unix systems.
+	unixArgsDiskLoad = []string{"-d", "-c", "1"}
+	// unixCmdDiskSpace is the command to get the disk space statistics on unix systems.
+	unixCmdDiskSpace = "df"
+	// unixArgsDiskSpace are the arguments to get the disk space statistics on unix systems.
+	unixArgsDiskSpace = []string{"-H"}
+	// unixCmdDiskSpaceInodes is the command to get the disk space inodes statistics on unix systems.
+	unixCmdDiskSpaceInodes = "df"
+	// unixArgsDiskSpaceInodes are the arguments to get the disk space inodes statistics on unix systems.
+	unixArgsDiskSpaceInodes = []string{"-i"}
 )
 
 // parser - struct to hold the parser dependencies.
@@ -42,13 +42,11 @@ func NewParser(execer cmd.Execer) *parser {
 
 // Parse parses the disk statistics of the system.
 func (p *parser) Parse(ctx context.Context) (models.DiskStats, error) {
-	switch p.execer.OS() {
-	case os.Darwin, os.Linux:
-		return p.parseForDarwin(ctx)
-		// return parseForLinux(ctx)
-	default:
-		return models.DiskStats{}, metrics.ErrUnsupportedOS
+	if p.execer.OS() == os.Darwin || p.execer.OS() == os.Linux {
+		return p.parseForUnix(ctx)
 	}
+
+	return models.DiskStats{}, metrics.ErrUnsupportedOS
 }
 
 // filesystemStringFromDfOutput parses the disk system by the provided df command output.

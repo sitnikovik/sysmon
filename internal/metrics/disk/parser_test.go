@@ -29,7 +29,7 @@ func Test_parser_Parse(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "ok darwin",
+			name: "unix",
 			fields: fields{
 				execerMockFunc: func(t *testing.T) cmd.Execer {
 					t.Helper()
@@ -37,7 +37,7 @@ func Test_parser_Parse(t *testing.T) {
 					execer := cmd.NewMockExecer(t)
 
 					execer.EXPECT().
-						Exec(darwinCmdDiskLoad, stringsUtils.ToInterfaces(darwinArgsDiskLoad)...).
+						Exec(unixCmdDiskLoad, stringsUtils.ToInterfaces(unixArgsDiskLoad)...).
 						Return(&cmd.Result{
 							Bytes: []byte(
 								"          disk0           disk1\n" +
@@ -47,7 +47,7 @@ func Test_parser_Parse(t *testing.T) {
 						}, nil).Once()
 
 					execer.EXPECT().
-						Exec(darwinCmdDiskSpaceInodes, stringsUtils.ToInterfaces(darwinArgsDiskSpaceInodes)...).
+						Exec(unixCmdDiskSpaceInodes, stringsUtils.ToInterfaces(unixArgsDiskSpaceInodes)...).
 						Return(&cmd.Result{
 							Bytes: []byte(
 								"Filesystem      Inodes   IUsed   IFree IUse% Mounted on\n" +
@@ -57,7 +57,7 @@ func Test_parser_Parse(t *testing.T) {
 						}, nil).Once()
 
 					execer.EXPECT().
-						Exec(darwinCmdDiskSpace, stringsUtils.ToInterfaces(darwinArgsDiskSpace)...).
+						Exec(unixCmdDiskSpace, stringsUtils.ToInterfaces(unixArgsDiskSpace)...).
 						Return(&cmd.Result{
 							Bytes: []byte(
 								"Filesystem      Size  Used Avail Use% Mounted on\n" +
@@ -68,7 +68,7 @@ func Test_parser_Parse(t *testing.T) {
 
 					execer.EXPECT().
 						OS().
-						Return(os.Darwin).Once()
+						Return(os.Linux).Once()
 
 					return execer
 				},

@@ -46,8 +46,6 @@ func (p *parser) Parse(ctx context.Context) (models.CPUStats, error) {
 		return p.parseForDarwin(ctx)
 	case os.Linux:
 		return p.parseForLinux(ctx)
-	case os.Windows:
-		return p.parseForWindows(ctx)
 	default:
 		return models.CPUStats{}, metrics.ErrUnsupportedOS
 	}

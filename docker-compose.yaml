@@ -10,6 +10,8 @@ services:
       - sysmon_network
     stdin_open: true
     tty: true
+    environment:
+      - GOPROXY=https://proxy.golang.org,direct
 
 networks:
   sysmon_network:

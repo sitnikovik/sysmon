@@ -1,9 +1,9 @@
-# Dockerfile.ubuntu
+# docker/Dockerfile.ubuntu1804
 FROM ubuntu:18.04
 
 # Install necessary packages to monitor the system
 RUN apt-get update && \
-    apt-get install -y net-tools iproute2 lsof ca-certificates curl && \
+    apt-get install -y net-tools iproute2 lsof ca-certificates curl sysstat && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/ss /usr/local/bin/netstat
@@ -14,6 +14,18 @@ RUN curl -OL https://golang.org/dl/go1.22.5.linux-amd64.tar.gz && \
     rm go1.22.5.linux-amd64.tar.gz && \
     ln -s /usr/local/go/bin/go /usr/bin/go
 
+# Set Go environment variables
+ENV PATH="/usr/local/go/bin:${PATH}"
+ENV GOPROXY=https://proxy.golang.org,direct
+
 COPY . /app
 WORKDIR /app
-CMD ["go", "run", "./cmd/sysmon"]
+
+# Install dependencies
+RUN go mod download
+
+# Build the Go application
+RUN go build -o bin/sysmon ./cmd/sysmon/
+
+# Set the entrypoint to run the application
+ENTRYPOINT ["./bin/sysmon"]

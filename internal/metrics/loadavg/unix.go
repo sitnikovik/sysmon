@@ -31,10 +31,10 @@ func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error
 		}
 	}
 
-	s := strings.Trim(parts[1], " ")
+	s := strings.Replace(strings.Trim(parts[1], " "), ",", "", -1)
 	_, err = fmt.Sscanf(s, "%f %f %f", &res.OneMin, &res.FiveMin, &res.FifteenMin)
 	if err != nil {
-		return models.LoadAverageStats{}, fmt.Errorf("parsing failed: %w", err)
+		return models.LoadAverageStats{}, fmt.Errorf("parsing failed: %w (%s)", err, s)
 	}
 
 	return res, err

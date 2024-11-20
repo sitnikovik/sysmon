@@ -69,6 +69,8 @@ bin/sysmon
 
 ![Output example](output_example.png)
 
+> NOTICE that **Disk Usage** shows the metrics for the main disk only.
+
 ## API
 
 There is a gRPC API to get the app results stored in `tmp/`

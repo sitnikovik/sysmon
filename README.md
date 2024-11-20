@@ -7,6 +7,15 @@ Daemon program to collect information about the system is running on and sends i
 - OS X (tested with 14.6.1)
 - Ubuntu (tested with 18.04, 23.10)
 
+## Metrics
+
+There are 4 (four) system monitoring metrics the app parses:
+
+- CPU Usage
+- Load Average
+- Disk Usage
+- Memory Usage
+
 ## Getting started
 
 - Clone the repo

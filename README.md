@@ -80,7 +80,7 @@ bin/sysmon
 
 ![Output example](output_example.png)
 
-> NOTICE that **Disk Usage** shows the metrics for the main disk only.
+> NOTICE that **Disk Usage** shows the metrics for all disks mounted.
 
 ## API
 

@@ -3,7 +3,7 @@ package loadavg
 import (
 	"context"
 	"errors"
-	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics"
@@ -31,12 +31,24 @@ func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error
 		}
 	}
 
-	s := strings.Trim(parts[1], " ")
-	s = strings.Replace(s, ",", "", 1)
-	_, err = fmt.Sscanf(s, "%f %f %f", &res.OneMin, &res.FiveMin, &res.FifteenMin)
-	if err != nil {
-		return models.LoadAverageStats{}, fmt.Errorf("parsing failed: %w (%s)", err, s)
+	fields := strings.Fields(strings.Trim(parts[1], " "))
+	if len(fields) != 3 {
+		return models.LoadAverageStats{}, errors.New("unexpected load avg digits length parsed")
 	}
 
-	return res, err
+	res.OneMin = p.parseFloat(fields[0])
+	res.FiveMin = p.parseFloat(fields[1])
+	res.FifteenMin = p.parseFloat(fields[2])
+
+	return res, nil
+}
+
+// parseFloat parses float by string
+func (p *parser) parseFloat(s string) float64 {
+	str := strings.TrimRight(s, ",")
+	str = strings.Replace(str, ",", "", 1)
+
+	f, _ := strconv.ParseFloat(str, 64)
+
+	return f
 }

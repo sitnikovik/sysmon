@@ -2,7 +2,6 @@ package disk
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -27,8 +26,8 @@ func (p *parser) parseForUnix(ctx context.Context) (models.DiskStats, error) {
 		return models.DiskStats{}, err
 	}
 
-	// Getting the disk space as inodes
-	err = p.parseDiskSpaceAsInodesForUnix(ctx, &res)
+	// // Getting the disk space as inodes
+	err = p.parseDiskSpaseAsInodesForUnix(ctx, &res)
 	if err != nil {
 		return models.DiskStats{}, err
 	}
@@ -37,10 +36,10 @@ func (p *parser) parseForUnix(ctx context.Context) (models.DiskStats, error) {
 }
 
 // parseDiskLoadForUnix parses the disk load for Unix OS and fills the provided result struct.
-func (p *parser) parseDiskLoadForUnix(ctx context.Context, res *models.DiskStats) error {
+func (p *parser) parseDiskLoadForUnix(_ context.Context, res *models.DiskStats) error {
 	cmdRes, err := p.execer.Exec(unixCmdDiskLoad, unixArgsDiskLoad...)
 	if err != nil {
-		return fmt.Errorf("failed to execute command: %w", err)
+		return err
 	}
 
 	lines := cmdRes.Lines()
@@ -53,36 +52,22 @@ func (p *parser) parseDiskLoadForUnix(ctx context.Context, res *models.DiskStats
 		return metrics.ErrInvalidOutput
 	}
 
-	kbPerTransferDisk0, err := strconv.ParseFloat(data[0], 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse kbPerTransferDisk0: %w", err)
-	}
-
-	transfersPerSecondDisk0, err := strconv.ParseFloat(data[1], 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse transfersPerSecondDisk0: %w", err)
-	}
+	KBtDisk0, _ := strconv.ParseFloat(data[0], 64) // KB/t для disk0
+	tpsDisk0, _ := strconv.ParseFloat(data[1], 64) // tps для disk0
 
 	// Filling the result struct for disk0
-	res.Reads = transfersPerSecondDisk0
-	readKBPerSec := kbPerTransferDisk0 * transfersPerSecondDisk0
+	res.Reads = tpsDisk0
+	readKBPerSec := KBtDisk0 * tpsDisk0
 	res.ReadWriteKb = readKBPerSec
 
 	// Check if data for disk1 is available
 	if len(data) >= 5 {
-		kbPerTransferDisk1, err := strconv.ParseFloat(data[3], 64)
-		if err != nil {
-			return fmt.Errorf("failed to parse kbPerTransferDisk1: %w", err)
-		}
-
-		transfersPerSecondDisk1, err := strconv.ParseFloat(data[4], 64)
-		if err != nil {
-			return fmt.Errorf("failed to parse transfersPerSecondDisk1: %w", err)
-		}
+		KBtDisk1, _ := strconv.ParseFloat(data[3], 64) // KB/t для disk1
+		tpsDisk1, _ := strconv.ParseFloat(data[4], 64) // tps для disk1
 
 		// Assuming that disk1 is doing writes
-		res.Writes = transfersPerSecondDisk1
-		writeKBPerSec := kbPerTransferDisk1 * transfersPerSecondDisk1
+		res.Writes = tpsDisk1
+		writeKBPerSec := KBtDisk1 * tpsDisk1
 		res.ReadWriteKb += writeKBPerSec
 	}
 
@@ -90,16 +75,17 @@ func (p *parser) parseDiskLoadForUnix(ctx context.Context, res *models.DiskStats
 }
 
 // parseDiskSpaceForUnix parses the disk space for Unix OS and fills the provided result struct.
-func (p *parser) parseDiskSpaceForUnix(ctx context.Context, res *models.DiskStats) error {
+func (p *parser) parseDiskSpaceForUnix(_ context.Context, res *models.DiskStats) error {
+	var err error
 	cmdRes, err := p.execer.Exec(unixCmdDiskSpace, unixArgsDiskSpace...)
 	if err != nil {
-		return fmt.Errorf("failed to execute command: %w", err)
+		return err
 	}
-
 	lines := cmdRes.Lines()
+
 	fsline, err := p.filesystemStringFromDfOutput("/System/Volumes/Data", lines)
 	if err != nil {
-		return fmt.Errorf("failed to get filesystem string: %w", err)
+		return err
 	}
 	data := strings.Fields(fsline)
 	if len(data) < 6 {
@@ -107,40 +93,31 @@ func (p *parser) parseDiskSpaceForUnix(ctx context.Context, res *models.DiskStat
 	}
 
 	// Getting the total disk space
-	total, err := strconv.ParseUint(strings.TrimSuffix(data[1], "G"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse total disk space: %w", err)
-	}
+	total, _ := strconv.ParseUint(strings.TrimSuffix(data[1], "G"), 10, 64)
 	res.TotalMb = total * 1024
 
 	// Getting the used disk space
-	used, err := strconv.ParseUint(strings.TrimSuffix(data[2], "G"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse used disk space: %w", err)
-	}
+	used, _ := strconv.ParseUint(strings.TrimSuffix(data[2], "G"), 10, 64)
 	res.UsedMb = used * 1024
 
 	// Getting the used disk space in percentage
-	usedPercent, err := strconv.ParseFloat(strings.TrimSuffix(data[4], "%"), 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse used disk space percentage: %w", err)
-	}
+	usedPercent, _ := strconv.ParseFloat(strings.TrimSuffix(data[4], "%"), 64)
 	res.UsedPercent = usedPercent
 
 	return nil
 }
 
-// parseDiskSpaceAsInodesForUnix parses the disk space as inodes for Unix OS and fills the provided result struct.
-func (p *parser) parseDiskSpaceAsInodesForUnix(ctx context.Context, res *models.DiskStats) error {
+// parseDiskSpaseAsInodesForUnix parses the disk space as inodes for unix OS and fills the provided result struct.
+func (p *parser) parseDiskSpaseAsInodesForUnix(_ context.Context, res *models.DiskStats) error {
 	cmdRes, err := p.execer.Exec(unixCmdDiskSpaceInodes, unixArgsDiskSpaceInodes...)
 	if err != nil {
-		return fmt.Errorf("failed to execute command: %w", err)
+		return err
 	}
 
 	lines := cmdRes.Lines()
 	fsline, err := p.filesystemStringFromDfOutput("/System/Volumes/Data", lines)
 	if err != nil {
-		return fmt.Errorf("failed to get filesystem string: %w", err)
+		return err
 	}
 	data := strings.Fields(fsline)
 	if len(data) < 6 {
@@ -148,17 +125,11 @@ func (p *parser) parseDiskSpaceAsInodesForUnix(ctx context.Context, res *models.
 	}
 
 	// Getting the used inodes
-	usedInodes, err := strconv.ParseUint(data[2], 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse used inodes: %w", err)
-	}
+	usedInodes, _ := strconv.ParseUint(data[2], 10, 64)
 	res.UsedInodes = usedInodes
 
 	// Getting the used inodes in percentage
-	usedInodesPercent, err := strconv.ParseFloat(strings.TrimSuffix(data[4], "%"), 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse used inodes percentage: %w", err)
-	}
+	usedInodesPercent, _ := strconv.ParseFloat(strings.TrimSuffix(data[4], "%"), 64)
 	res.UsedInodesPercent = usedInodesPercent
 
 	return nil

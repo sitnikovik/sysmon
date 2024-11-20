@@ -23,4 +23,4 @@ WORKDIR /app
 # Build the Go application
 RUN go build -o bin/sysmon ./cmd/sysmon/ 
 
-ENTRYPOINT [ "bin/sysmon" ]
+# ENTRYPOINT [ "bin/sysmon" ]

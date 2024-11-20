@@ -42,8 +42,11 @@ func NewParser(execer cmd.Execer) *parser {
 
 // Parse parses the disk statistics of the system.
 func (p *parser) Parse(ctx context.Context) (models.DiskStats, error) {
-	if p.execer.OS() == os.Darwin || p.execer.OS() == os.Linux {
-		return p.parseForUnix(ctx)
+	switch p.execer.OS() {
+	case os.Darwin:
+		return p.parseForDarwin(ctx)
+	case os.Linux:
+		return p.parseForLinux(ctx)
 	}
 
 	return models.DiskStats{}, metrics.ErrUnsupportedOS

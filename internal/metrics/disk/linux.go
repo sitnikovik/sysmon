@@ -2,8 +2,8 @@ package disk
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics"
@@ -48,41 +48,51 @@ func (p *parser) parseDiskLoadForLinux(_ context.Context, res *models.DiskStats)
 		return metrics.ErrInvalidOutput
 	}
 
-	// Find the first disk to parse only
-	var dataLine string
-	for i, line := range lines {
-		if strings.Contains(line, "Device") {
-			dataLine = lines[i+1]
-			break
+	// Find all lines with disk data
+	dataLines := make([]string, 0, len(lines))
+	var foundHeadersLine bool
+	for _, line := range lines {
+		if line == "" {
+			continue
 		}
+		if !foundHeadersLine {
+			if strings.Contains(line, "Device") {
+				foundHeadersLine = true
+			}
+			continue
+		}
+		dataLines = append(dataLines, line)
 	}
-	if dataLine == "" {
-		return errors.New("failed to find data line")
-	}
-
-	fields := strings.Fields(dataLine)
-	if len(fields) < 6 {
-		return fmt.Errorf("unexpected output format")
-	}
-
-	tps, err := p.parseFloat(fields[1])
-	if err != nil {
-		return fmt.Errorf("failed to parse tps: %w", err)
+	if len(dataLines) == 0 {
+		return fmt.Errorf("no disk data found")
 	}
 
-	kbReadPerS, err := p.parseFloat(fields[2])
-	if err != nil {
-		return fmt.Errorf("failed to parse kb_read/s: %w", err)
-	}
+	// Sums the values of all disks
+	for _, dataLine := range dataLines {
+		fields := strings.Fields(dataLine)
+		if len(fields) < 6 {
+			return fmt.Errorf("unexpected output format for disk data: %s", dataLine)
+		}
 
-	kbWrtnPerS, err := p.parseFloat(fields[3])
-	if err != nil {
-		return fmt.Errorf("failed to parse kb_wrtn/s: %w", err)
-	}
+		tps, err := p.parseFloat(fields[1])
+		if err != nil {
+			return fmt.Errorf("failed to parse tps '%s': %w", fmt.Sprint(fields[1]), err)
+		}
 
-	res.Reads = tps
-	res.Writes = kbWrtnPerS
-	res.ReadWriteKb = kbReadPerS + kbWrtnPerS
+		kbReadPerS, err := strconv.ParseFloat(fields[2], 64)
+		if err != nil {
+			return fmt.Errorf("failed to parse kb_read/s: %w", err)
+		}
+
+		kbWrtnPerS, err := strconv.ParseFloat(fields[3], 64)
+		if err != nil {
+			return fmt.Errorf("failed to parse kb_wrtn/s: %w", err)
+		}
+
+		res.Reads += tps
+		res.Writes += kbWrtnPerS
+		res.ReadWriteKb += kbReadPerS + kbWrtnPerS
+	}
 
 	return nil
 }

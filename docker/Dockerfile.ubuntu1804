@@ -23,4 +23,5 @@ WORKDIR /app
 # Build the Go application
 RUN go build -o bin/sysmon ./cmd/sysmon/ 
 
-ENTRYPOINT [ "bin/sysmon" ]
+# Run the app MANUALLY when the container starts
+# See the README.md for more information

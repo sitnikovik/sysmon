@@ -23,6 +23,17 @@ make install-deps
 make build
 ```
 
+### Docker
+
+You can try the app using the docker image with Ubuntu 18.04 to check how it works.
+For more docker configuration check `docker-compose.yaml`.
+
+```sh
+# Runs the sysmon service in a docker container with the ubuntu1804 image 
+# and attach to the container in interactive mode
+make docker
+```
+
 ## Usage
 
 - `-n` - interval of time to output the metrics

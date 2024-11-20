@@ -23,10 +23,12 @@ protos:
 run: build
 	bin/sysmon
 
-# Run the sysmon service in a docker container
-.PHONY: docker-up
-docker-up:
-	docker-compose up --build ubuntu1804
+# Runs the sysmon service in a docker container with the ubuntu1804 image 
+# and attach to the container in interactive mode
+.PHONY: docker
+docker:
+	docker-compose up -d --build ubuntu1804 && \
+	docker-compose run --service-ports --rm ubuntu1804 /bin/bash
 
 # Build the sysmon binary for the host OS
 .PHONY: build

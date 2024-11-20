@@ -66,7 +66,7 @@ func (p *parser) parseFSnameFromDfOutput(lines []string) (string, error) {
 	return "", errors.New("filesystem line not found")
 }
 
-// parseFloat parses float by string
+// parseFloat parses float by string.
 func (p *parser) parseFloat(s string) (float64, error) {
 	str := strings.Replace(s, ",", ".", 1)
 

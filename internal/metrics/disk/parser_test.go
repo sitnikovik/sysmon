@@ -105,7 +105,8 @@ func Test_parser_Parse(t *testing.T) {
 								"Linux 4.15.0-112-generic (hostname) 	09/01/2021 	_x86_64_	(4 CPU)\n" +
 									"\n" +
 									"Device             tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn\n" +
-									"sda               1.00         20.00         350.00          50          10\n",
+									"sda               1.00         20.00         350.00          50          10\n" +
+									"sda1               2.00         21.00         312.00          20          20\n",
 							),
 						}, nil).
 						Once()
@@ -142,9 +143,9 @@ func Test_parser_Parse(t *testing.T) {
 				ctx: context.Background(),
 			},
 			want: models.DiskStats{
-				Reads:             1,
-				Writes:            350,
-				ReadWriteKb:       20 + 350,
+				Reads:             3,
+				Writes:            662,
+				ReadWriteKb:       20 + 350 + 21 + 312,
 				TotalMb:           50 * 1024,
 				UsedMb:            20 * 1024,
 				UsedPercent:       40,
@@ -183,8 +184,8 @@ func Test_parser_Parse(t *testing.T) {
 			}
 			got, err := p.Parse(tt.args.ctx)
 
+			require.Equalf(t, tt.wantErr, err != nil, "error = %v", err)
 			require.Equal(t, tt.want, got)
-			require.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }

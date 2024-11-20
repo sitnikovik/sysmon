@@ -81,6 +81,7 @@ func Test_parser_Parse(t *testing.T) {
 				ActiveMb:    12140,
 				InactiveMb:  12126,
 				WiredMb:     2421,
+				CachedMb:    3,
 			},
 		},
 		{
@@ -116,7 +117,6 @@ func Test_parser_Parse(t *testing.T) {
 				AvailableMb: 20265,
 				FreeMb:      1234,
 				UsedMb:      10659,
-				BuffersMb:   20265,
 				CachedMb:    20265,
 			},
 		},

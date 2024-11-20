@@ -58,7 +58,6 @@ func (p *parser) parseForLinux(_ context.Context) (models.MemoryStats, error) {
 		TotalMb:     totalMb,
 		UsedMb:      usedMb,
 		FreeMb:      freeMb,
-		BuffersMb:   buffersMb,
 		CachedMb:    cachedMb,
 		AvailableMb: availableMb,
 	}, nil

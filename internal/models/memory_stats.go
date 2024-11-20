@@ -7,7 +7,7 @@ import (
 )
 
 // memoryStatsFmt is the format for the memory statistics string.
-const memoryStatsFmt = "%-12s %-12s %-10s %-10s %-10s %-10s %-12s %-12s %-12s"
+const memoryStatsFmt = "%-12s %-12s %-10s %-10s %-10s %-12s %-12s %-12s"
 
 // MemoryStats defines the memory statistics.
 type MemoryStats struct {
@@ -31,10 +31,6 @@ type MemoryStats struct {
 	// These are usually mission-critical pages that are used by the operating system kernel or drivers,
 	// and they are necessary for the system to work.
 	WiredMb uint64 `json:"wiredMb"`
-	// BuffersMb shows how much memory in MB that are used by the kernel to cache data from disk.
-	// This is used to speed up disk operations by storing data in memory.
-	// Buffers are usually used for file system metadata and are not used for application data.
-	BuffersMb uint64 `json:"buffersMb"`
 	// CachedMb shows how much memory in MB that are used by the kernel to cache data from disk.
 	// This is used to speed up disk operations by storing data in memory.
 	// Cached data is usually used for application data and can be freed up if necessary.
@@ -47,7 +43,7 @@ func (m MemoryStats) String() string {
 	// Может быть актуально когда заведем на других ОС
 	headers := fmt.Sprintf(
 		memoryStatsFmt+"\n",
-		"Total", "Available", "Used", "Free", "Buffers", "Cached", "Active", "Inactive", "Wired",
+		"Total", "Available", "Used", "Free", "Cached", "Active", "Inactive", "Wired",
 	)
 	values := fmt.Sprintf(
 		memoryStatsFmt,
@@ -55,7 +51,6 @@ func (m MemoryStats) String() string {
 		utils.BeatifyNumber(m.AvailableMb)+" MB",
 		utils.BeatifyNumber(m.UsedMb)+" MB",
 		utils.BeatifyNumber(m.FreeMb)+" MB",
-		utils.BeatifyNumber(m.BuffersMb)+" MB",
 		utils.BeatifyNumber(m.CachedMb)+" MB",
 		utils.BeatifyNumber(m.ActiveMb)+" MB",
 		utils.BeatifyNumber(m.InactiveMb)+" MB",

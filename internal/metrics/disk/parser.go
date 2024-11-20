@@ -15,7 +15,7 @@ var (
 	// unixCmdDiskLoad is the command to get the disk load statistics on unix systems.
 	unixCmdDiskLoad = "iostat"
 	// unixArgsDiskLoad are the arguments to get the disk load statistics on unix systems.
-	unixArgsDiskLoad = []string{"-d", "-c", "1"}
+	unixArgsDiskLoad = []string{"-d", "1", "2"}
 	// unixCmdDiskSpace is the command to get the disk space statistics on unix systems.
 	unixCmdDiskSpace = "df"
 	// unixArgsDiskSpace are the arguments to get the disk space statistics on unix systems.
@@ -49,18 +49,13 @@ func (p *parser) Parse(ctx context.Context) (models.DiskStats, error) {
 	return models.DiskStats{}, metrics.ErrUnsupportedOS
 }
 
-// filesystemStringFromDfOutput parses the disk system by the provided df command output.
-func (p *parser) filesystemStringFromDfOutput(fsname string, lines []string) (string, error) {
-	for _, line := range lines {
-		if strings.Contains(line, fsname) {
-			return line, nil
-		}
-	}
-
+// parseFSnameFromDfOutput parses the disk system by the provided df command output.
+func (p *parser) parseFSnameFromDfOutput(lines []string) (string, error) {
 	// Return root filesystem if the previous one is not found
-	for _, line := range lines {
-		if strings.Contains(line, "/") {
-			return line, nil
+	for i, line := range lines {
+		fields := strings.Fields(line)
+		if fields[len(fields)-1] == "/" {
+			return lines[i], nil
 		}
 	}
 

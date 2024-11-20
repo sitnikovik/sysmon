@@ -20,13 +20,13 @@ protos:
 
 # Run the sysmon service locally
 .PHONY: run
-run:
-	go run ./cmd/sysmon/
+run: build
+	bin/sysmon
 
 # Run the sysmon service in a docker container
 .PHONY: docker-up
 docker-up:
-	docker-compose up --build ubuntu1804
+	docker-compose up -d --build ubuntu1804
 
 # Build the sysmon binary for the host OS
 .PHONY: build

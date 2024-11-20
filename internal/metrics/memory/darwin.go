@@ -3,7 +3,6 @@ package memory
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/models"
@@ -44,7 +43,6 @@ func (p *parser) parseForDarwin(_ context.Context) (models.MemoryStats, error) {
 		}
 	}
 
-	log.Fatal(speculativel)
 	total := free + active + inactive + speculativel + wired + throttled
 	available := free + inactive
 	used := total - available

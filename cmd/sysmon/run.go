@@ -47,7 +47,7 @@ func NewMetricsStringBuilder() *metricsStringBuilder {
 // append appends the metric name and the string representation of the metric
 // or print the error if the metric parsing failed.
 func (m *metricsStringBuilder) append(metricName, s string, err error) {
-	m.sb.WriteString(utils.BgGreenText(utils.BoldText(metricName + "\n")))
+	m.sb.WriteString(utils.BgGreenText(utils.BoldText(metricName)) + "\n")
 
 	if err != nil {
 		switch {

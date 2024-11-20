@@ -21,7 +21,6 @@ COPY . /app
 WORKDIR /app
 
 # Build the Go application
-RUN go build -o bin/sysmon ./cmd/sysmon/
+RUN go build -o bin/sysmon ./cmd/sysmon/ 
 
-# Set the entrypoint to run the application
-ENTRYPOINT ["./bin/sysmon"]
+ENTRYPOINT [ "bin/sysmon" ]

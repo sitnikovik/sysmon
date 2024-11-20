@@ -1,10 +1,5 @@
 # sysmon
 
-[![Build Status](https://github.com/sitnikovik/sysmon/actions/workflows/go.yml/badge.svg)](https://github.com/sitnikovik/sysmon/actions)
-[![Coverage Status](https://coveralls.io/repos/github/sitnikovik/sysmon/badge.svg?branch=master)](https://coveralls.io/github/sitnikovik/sysmon?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/sitnikovik/sysmon)](https://goreportcard.com/report/github.com/sitnikovik/sysmon)
-[![License](https://img.shields.io/github/license/sitnikovik/sysmon)](https://github.com/sitnikovik/sysmon/blob/master/LICENSE)
-
 Daemon program to collect information about the system is running on and sends it to its clients in GRPC.
 
 ## Supported platforms
@@ -35,7 +30,25 @@ make build
 - `-grpc-port` - gRPC port to run the gRPC-server to get metrics by API
 - `--config` - path to the configuration yaml-file that stores all app settings
 
-> Config values replaces flag values
+Configuration example
+
+```yaml
+# Interval of time to output the metrics
+interval: 1
+# Margin of time between statistics output
+margin: 2
+# Port to listen for gRPC requests
+grpcPort: 50051
+exclude:
+  metrics:
+    # List of metrics to exclude from the output
+    - cpu
+    - memory
+    - loadavg
+    - disk
+```
+
+> NOTICE that config values replace flag values
 
 ```sh
 # Runs the app with yaml configuration file

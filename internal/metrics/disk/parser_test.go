@@ -12,6 +12,7 @@ import (
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
+//nolint:funlen
 func Test_parser_Parse(t *testing.T) {
 	t.Parallel()
 

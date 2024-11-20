@@ -4,8 +4,8 @@ Daemon program to collect information about the system is running on and sends i
 
 ## Supported platforms
 
-- OS X (Tested on 14.6.1)
-- Ubuntu 18.04
+- OS X (tested with 14.6.1)
+- Ubuntu (tested with 18.04, 23.10)
 
 ## Getting started
 

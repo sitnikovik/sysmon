@@ -3,7 +3,7 @@ package loadavg
 import (
 	"context"
 	"errors"
-	"strconv"
+	"fmt"
 	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics"
@@ -36,19 +36,23 @@ func (p *parser) parseForUnix(_ context.Context) (models.LoadAverageStats, error
 		return models.LoadAverageStats{}, errors.New("unexpected load avg digits length parsed")
 	}
 
-	res.OneMin = p.parseFloat(fields[0])
-	res.FiveMin = p.parseFloat(fields[1])
-	res.FifteenMin = p.parseFloat(fields[2])
+	oneMin, err := p.parseFloat(fields[0])
+	if err != nil {
+		return models.LoadAverageStats{}, fmt.Errorf("failed to parse one min: %w", err)
+	}
+	res.OneMin = oneMin
+
+	fiveMin, err := p.parseFloat(fields[1])
+	if err != nil {
+		return models.LoadAverageStats{}, fmt.Errorf("failed to parse five min: %w", err)
+	}
+	res.FiveMin = fiveMin
+
+	fifteenMin, err := p.parseFloat(fields[2])
+	if err != nil {
+		return models.LoadAverageStats{}, fmt.Errorf("failed to parse fifteenMin min: %w", err)
+	}
+	res.FifteenMin = fifteenMin
 
 	return res, nil
-}
-
-// parseFloat parses float by string
-func (p *parser) parseFloat(s string) float64 {
-	str := strings.TrimRight(s, ",")
-	str = strings.Replace(str, ",", "", 1)
-
-	f, _ := strconv.ParseFloat(str, 64)
-
-	return f
 }

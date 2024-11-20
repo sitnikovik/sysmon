@@ -2,6 +2,8 @@ package loadavg
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics"
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
@@ -33,4 +35,12 @@ func (p *parser) Parse(ctx context.Context) (models.LoadAverageStats, error) {
 	}
 
 	return models.LoadAverageStats{}, metrics.ErrUnsupportedOS
+}
+
+// parseFloat parses float by string
+func (p *parser) parseFloat(s string) (float64, error) {
+	str := strings.TrimRight(s, ",")
+	str = strings.Replace(str, ",", ".", 1)
+
+	return strconv.ParseFloat(str, 64)
 }

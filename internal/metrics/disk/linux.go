@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/sitnikovik/sysmon/internal/metrics"
@@ -49,12 +48,6 @@ func (p *parser) parseDiskLoadForLinux(_ context.Context, res *models.DiskStats)
 		return metrics.ErrInvalidOutput
 	}
 
-	// Debug output to see the lines returned by iostat
-	fmt.Println("Output of iostat:")
-	for i, line := range lines {
-		fmt.Printf("Line %d: %s\n", i, line)
-	}
-
 	// Find the first disk to parse only
 	var dataLine string
 	for i, line := range lines {
@@ -72,17 +65,17 @@ func (p *parser) parseDiskLoadForLinux(_ context.Context, res *models.DiskStats)
 		return fmt.Errorf("unexpected output format")
 	}
 
-	tps, err := strconv.ParseFloat(fields[1], 64)
+	tps, err := p.parseFloat(fields[1])
 	if err != nil {
 		return fmt.Errorf("failed to parse tps: %w", err)
 	}
 
-	kbReadPerS, err := strconv.ParseFloat(fields[2], 64)
+	kbReadPerS, err := p.parseFloat(fields[2])
 	if err != nil {
 		return fmt.Errorf("failed to parse kb_read/s: %w", err)
 	}
 
-	kbWrtnPerS, err := strconv.ParseFloat(fields[3], 64)
+	kbWrtnPerS, err := p.parseFloat(fields[3])
 	if err != nil {
 		return fmt.Errorf("failed to parse kb_wrtn/s: %w", err)
 	}

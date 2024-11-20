@@ -2,6 +2,7 @@ package cpu
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -19,9 +20,22 @@ func (p *parser) parseForLinux(_ context.Context) (models.CPUStats, error) {
 	for _, line := range cmdRes.Lines() {
 		if strings.HasPrefix(line, "%Cpu(s):") {
 			parts := strings.Fields(line)
-			res.User, _ = strconv.ParseFloat(parts[1], 64)
-			res.System, _ = strconv.ParseFloat(parts[3], 64)
-			res.Idle, _ = strconv.ParseFloat(parts[7], 64)
+
+			res.User, err = strconv.ParseFloat(strings.Replace(parts[1], ",", ".", 1), 64)
+			if err != nil {
+				return models.CPUStats{}, fmt.Errorf("parsing user cpu: %w", err)
+			}
+
+			res.System, err = strconv.ParseFloat(strings.Replace(parts[3], ",", ".", 1), 64)
+			if err != nil {
+				return models.CPUStats{}, fmt.Errorf("parsing system cpu: %w", err)
+			}
+
+			res.Idle, err = strconv.ParseFloat(strings.Replace(parts[7], ",", ".", 1), 64)
+			if err != nil {
+				return models.CPUStats{}, fmt.Errorf("parsing idle cpu: %w", err)
+			}
+
 			break
 		}
 	}

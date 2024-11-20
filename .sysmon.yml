@@ -8,6 +8,6 @@ exclude:
   metrics:
     # List of metrics to exclude from the output
     - cpu
-    - memory
     - loadavg
-    - disk
+    - memory
+    #- disk

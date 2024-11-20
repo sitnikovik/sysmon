@@ -14,15 +14,11 @@ var (
 	cmdDarwin = "top"
 	// cmdLinux is the command to get the CPU statistics on Linux systems.
 	cmdLinux = "top"
-	// cmdWindows is the command to get the CPU statistics on Windows systems.
-	cmdWindows = "wmic"
 
 	// argsDarwin are the arguments to get the CPU statistics on Darwin systems.
 	argsDarwin = []string{"-l", "1", "-s", "0"}
 	// argsLinux are the arguments to get the CPU statistics on Linux systems.
 	argsLinux = []string{"-b", "-n", "1"}
-	// argsWindows are the arguments to get the CPU statistics on Windows systems.
-	argsWindows = []string{"cpu", "get", "loadpercentage"}
 )
 
 // parser - struct to hold the parser dependencies.

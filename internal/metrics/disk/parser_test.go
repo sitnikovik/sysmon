@@ -44,7 +44,8 @@ func Test_parser_Parse(t *testing.T) {
 									"KB/t tps  MB/s     KB/t tps  MB/s\n" +
 									"  32  10   0.31      64  20   1.25\n",
 							),
-						}, nil).Once()
+						}, nil).
+						Once()
 
 					execer.EXPECT().
 						Exec(unixCmdDiskSpaceInodes, stringsUtils.ToInterfaces(unixArgsDiskSpaceInodes)...).
@@ -54,7 +55,8 @@ func Test_parser_Parse(t *testing.T) {
 									"/dev/sda1      3276800  1048576 2228224   32% /\n" +
 									"tmpfs           128000     4000  124000    3% /run\n",
 							),
-						}, nil).Once()
+						}, nil).
+						Once()
 
 					execer.EXPECT().
 						Exec(unixCmdDiskSpace, stringsUtils.ToInterfaces(unixArgsDiskSpace)...).
@@ -68,7 +70,7 @@ func Test_parser_Parse(t *testing.T) {
 
 					execer.EXPECT().
 						OS().
-						Return(os.Linux).Once()
+						Return(os.Linux)
 
 					return execer
 				},
@@ -86,6 +88,26 @@ func Test_parser_Parse(t *testing.T) {
 				UsedInodes:        1048576,
 				UsedInodesPercent: 32,
 			},
+		},
+		{
+			name: "err windows unsupported",
+			fields: fields{
+				execerMockFunc: func(t *testing.T) cmd.Execer {
+					t.Helper()
+
+					execer := cmd.NewMockExecer(t)
+
+					execer.EXPECT().
+						OS().
+						Return(os.Windows)
+
+					return execer
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

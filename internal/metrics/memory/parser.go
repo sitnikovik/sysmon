@@ -17,11 +17,6 @@ var (
 	cmdLinux = "free"
 	// cmdLinuxArgs are the arguments for the command to get memory statistics on Linux.
 	cmdLinuxArgs = []string{"-m"}
-
-	// cmdWindows is the command to get memory statistics on Windows.
-	cmdWindows = "wmic"
-	// cmdWindowsArgs are the arguments for the command to get memory statistics on Windows.
-	cmdWindowsArgs = []string{"os", "get", "FreePhysicalMemory,TotalVisibleMemorySize"}
 )
 
 // parser is an implementation of Parser.

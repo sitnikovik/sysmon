@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sitnikovik/sysmon/internal/metrics/utils/cmd"
+	"github.com/sitnikovik/sysmon/internal/metrics/utils/strings"
 	"github.com/sitnikovik/sysmon/internal/models"
 )
 
@@ -76,9 +77,47 @@ func Test_parser_Parse(t *testing.T) {
 				TotalMb:     26842,
 				AvailableMb: 12277,
 				FreeMb:      151,
+				UsedMb:      14565,
 				ActiveMb:    12140,
 				InactiveMb:  12126,
 				WiredMb:     2421,
+			},
+		},
+		{
+			name: "ok linux",
+			fields: fields{
+				execerMockFunc: func(t *testing.T) cmd.Execer {
+					execer := cmd.NewMockExecer(t)
+
+					execer.EXPECT().
+						Exec(cmdLinux, strings.ToInterfaces(cmdLinuxArgs)...).
+						Return(&cmd.Result{
+							// free -m
+							Bytes: []byte(
+								"              total        used        free      shared  buff/cache   available\n" +
+									"Mem:          32159       10659        1234        1234       20265       20265\n" +
+									"Swap:          2047          10        2037\n",
+							),
+						}, nil).
+						Once()
+
+					execer.EXPECT().
+						OS().
+						Return("linux")
+
+					return execer
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			want: models.MemoryStats{
+				TotalMb:     32159,
+				AvailableMb: 20265,
+				FreeMb:      1234,
+				UsedMb:      10659,
+				BuffersMb:   20265,
+				CachedMb:    20265,
 			},
 		},
 	}

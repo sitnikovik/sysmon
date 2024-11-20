@@ -43,9 +43,14 @@ func (p *parser) parseForDarwin(_ context.Context) (models.MemoryStats, error) {
 		}
 	}
 
+	total := free + active + inactive + speculativel + wired + throttled
+	available := free + inactive
+	used := total - available
+
 	return models.MemoryStats{
-		TotalMb:     pagesToMB(free+active+inactive+speculativel+wired+throttled, pageSizeB),
-		AvailableMb: pagesToMB(free+inactive, pageSizeB),
+		TotalMb:     pagesToMB(total, pageSizeB),
+		AvailableMb: pagesToMB(available, pageSizeB),
+		UsedMb:      pagesToMB(used, pageSizeB),
 		FreeMb:      pagesToMB(free, pageSizeB),
 		ActiveMb:    pagesToMB(active, pageSizeB),
 		InactiveMb:  pagesToMB(inactive, pageSizeB),

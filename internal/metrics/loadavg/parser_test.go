@@ -69,12 +69,13 @@ func Test_parser_Parse(t *testing.T) {
 					execer.EXPECT().
 						Exec(cmdUnix).
 						Return(&cmd.Result{
-							Bytes: []byte("23:04  up 42 days, 13:14, 1 user, load averages: 3.99 3.95 3.58"),
-						}, nil).Once()
+							Bytes: []byte("23:04  up 42 days, 13:14, 1 user, load average: 3.99 3.95 3.58"),
+						}, nil).
+						Once()
 
 					execer.EXPECT().
 						OS().
-						Return(os.Linux).Once()
+						Return(os.Linux)
 
 					return execer
 				},

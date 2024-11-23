@@ -1,0 +1,13 @@
+# Interval of time to output the metrics
+interval: 1
+# Margin of time between statistics output
+margin: 2
+# Port to listen for gRPC requests
+grpcPort: 50051
+exclude:
+  metrics:
+    # List of metrics to exclude from the output
+    - cpu
+    - loadavg
+    - memory
+    #- disk

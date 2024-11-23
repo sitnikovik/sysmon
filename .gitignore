@@ -1,0 +1,8 @@
+.vscode/
+.idea/
+.obsidian/
+bin/
+
+.DS_Store
+VERSION
+config.yaml

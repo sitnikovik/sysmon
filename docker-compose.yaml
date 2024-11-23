@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  ubuntu1804:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ubuntu1804
+    container_name: ubuntu1804
+    networks:
+      - sysmon_network
+    stdin_open: true
+    tty: true
+    environment:
+      - GOPROXY=https://proxy.golang.org,direct
+
+networks:
+  sysmon_network:
+    driver: bridge

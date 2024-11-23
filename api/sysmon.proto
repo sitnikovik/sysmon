@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package monitor;
+
+option go_package="github.com/sitnikovik/sysmon/pkg/v1;sysmon_v1";
+
+service SystemStats {
+    rpc GetStats (StatsRequest) returns (StatsResponse) {}
+}
+
+message StatsRequest {}
+
+message StatsResponse {
+    // Represents the CPU statistics
+    CPU cpu = 1;
+    // Represents the disk statistics
+    Disk disk = 2;
+    // Represents the memory statistics
+    Memory memory = 3;
+    // Represents the system load average
+    LoadAverage loadAverage = 4;
+
+    // Represents the CPU statistics
+    message CPU {
+        // Percentage of CPU time spent in user space
+        double user = 1;
+        // Percentage of CPU time spent in kernel space
+        double system = 2;
+        // Percentage of CPU time spent idle
+        double idle = 3;
+    }
+
+    // Represents the disk statistics
+    message Disk {
+	    // Number of reads per second
+        double reads = 1;
+        // Number of writes per second
+        double writes = 2;
+        // Number of kilobytes read+write per second
+        double readWriteKb = 3;
+        // Total disk space in Mb
+        uint64 totalMb = 4;
+        // Used disk space in Mb
+        uint64 usedMb = 5;
+        // Used disk space in percentage
+        double usedPercent = 6;
+        // Number of used inodes
+        uint64 usedInodes = 7;
+        // Used inodes in percentage
+        double usedInodesPercent = 8;
+    }
+
+    message Memory {
+        // Total memory in Mb
+        uint64 totalMb = 1;
+        // Available memory in Mb shows how much memory in Mb is available for new processes.
+        uint64 availableMb = 2;
+        // Free memory in Mb shows how much memory in Mb is available for new processes.
+        // If this value is high, it means that the system has some spare memory,
+        // allowing more applications to run without having to free up memory.
+        uint64 freeMb = 3;
+        // Active memory in Mb hows how much memory in Mb that are currently being actively used by processes.
+	    // These pages contain data that is actively being read or written.
+        uint64 activeMb = 4;
+        // Inactive shows how much memory in Mb that were previously used but are not currently active.
+	    // These pages may contain data that is not used, but can be restored to the active state if necessary.
+        uint64 inactiveMb = 5;
+        // Wired shows how much memory in Mb  that are hard-locked in RAM and cannot be paged out or released.
+        // These are usually mission-critical pages that are used by the operating system kernel or drivers,
+        // and they are necessary for the system to work.
+        uint64 WiredMb = 6;
+    }
+
+    // Represents the system load average
+    message LoadAverage {
+        // Average load for the last minute
+        double oneMin = 1;
+        // Average load for the last five minutes
+        double fiveMin = 2;
+        // Average load for the last fifteen minutes
+        double fifteenMin = 3;
+    }
+}
+
